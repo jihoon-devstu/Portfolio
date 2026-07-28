@@ -1,20 +1,15 @@
 import type { ReactNode } from 'react'
 
-const STEP_STYLE: Record<string, { badge: string; label: string }> = {
-  problem: { badge: 'bg-red-50 text-red-600', label: '문제' },
-  cause: { badge: 'bg-amber-50 text-amber-600', label: '원인' },
-  solution: { badge: 'bg-blue-50 text-blue-600', label: '해결' },
-  result: { badge: 'bg-emerald-50 text-emerald-600', label: '결과' },
-}
-
-function Step({ kind, children }: { kind: keyof typeof STEP_STYLE; children: ReactNode }) {
-  const s = STEP_STYLE[kind]
+/** 단계 라벨 — 색 배지 대신 테크니컬 라이팅 스타일의 타이포 라벨 */
+function Step({ label, children, accent = false }: { label: string; children: ReactNode; accent?: boolean }) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+    <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
       <span
-        className={`h-fit w-fit shrink-0 rounded-md px-2.5 py-1 text-sm font-bold sm:w-14 sm:text-center ${s.badge}`}
+        className={
+          'w-14 shrink-0 pt-px text-sm font-bold ' + (accent ? 'text-accent-deep' : 'text-ink')
+        }
       >
-        {s.label}
+        {label}.
       </span>
       <div className="min-w-0 flex-1 leading-relaxed text-slate-700">{children}</div>
     </div>
@@ -22,7 +17,7 @@ function Step({ kind, children }: { kind: keyof typeof STEP_STYLE; children: Rea
 }
 
 /**
- * 트러블슈팅 카드: 문제 → 원인 → 해결 → 결과 4단 구조.
+ * 트러블슈팅: 문제 → 원인 → 해결 → 결과 4단 구조.
  * 긴 부연 설명·이미지·코드는 detail(펼치기 영역)로 내려 가시성을 유지한다.
  */
 export default function TroubleCard({
@@ -33,7 +28,7 @@ export default function TroubleCard({
   solution,
   result,
   detail,
-  detailLabel = '상세 과정 펼쳐보기',
+  detailLabel = '과정과 검증 자세히 보기',
 }: {
   no: number
   title: string
@@ -45,25 +40,25 @@ export default function TroubleCard({
   detailLabel?: string
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 shadow-sm">
-      <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
-          {no}
-        </span>
-        <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+    <div className="border-t border-slate-200 pt-6">
+      <div className="flex items-baseline gap-3">
+        <span className="text-sm font-bold text-slate-400">{String(no).padStart(2, '0')}</span>
+        <h3 className="text-lg font-bold text-ink">{title}</h3>
       </div>
-      <div className="space-y-4 px-5 py-5 sm:px-6">
-        <Step kind="problem">{problem}</Step>
-        <Step kind="cause">{cause}</Step>
-        <Step kind="solution">{solution}</Step>
-        <Step kind="result">{result}</Step>
+      <div className="mt-4 space-y-3.5 sm:pl-8">
+        <Step label="문제">{problem}</Step>
+        <Step label="원인">{cause}</Step>
+        <Step label="해결">{solution}</Step>
+        <Step label="결과" accent>
+          {result}
+        </Step>
         {detail && (
-          <details className="group mt-2 rounded-lg bg-slate-50">
-            <summary className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800">
-              <span className="chevron text-blue-500">▶</span>
+          <details className="group mt-3 rounded-md bg-slate-50">
+            <summary className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-ink">
+              <span className="chevron text-accent">▶</span>
               {detailLabel}
             </summary>
-            <div className="space-y-4 px-4 pb-4 text-[15px] leading-relaxed text-slate-700">
+            <div className="space-y-4 px-4 pb-4 text-base leading-relaxed text-slate-700">
               {detail}
             </div>
           </details>

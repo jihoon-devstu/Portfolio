@@ -9,11 +9,11 @@ function NotFound() {
   return (
     <div className="flex flex-col items-center py-32 text-center">
       <p className="text-5xl font-extrabold text-slate-300">404</p>
-      <h1 className="mt-4 text-2xl font-bold text-slate-900">페이지를 찾을 수 없습니다</h1>
+      <h1 className="mt-4 text-2xl font-bold text-ink">페이지를 찾을 수 없습니다</h1>
       <p className="mt-2 text-slate-500">주소가 잘못되었거나 삭제된 페이지입니다.</p>
       <Link
         to="/"
-        className="mt-8 rounded-lg bg-slate-900 px-5 py-2.5 font-medium text-white transition-colors hover:bg-slate-700"
+        className="mt-8 rounded-sm bg-ink px-5 py-2.5 font-medium text-white transition-colors hover:bg-accent-deep"
       >
         홈으로 돌아가기
       </Link>

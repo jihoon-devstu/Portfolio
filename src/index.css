@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/*
+ * 색 토큰 — Tailwind 기본 팔레트 대신 직접 정한 값.
+ * 잉크: 푸른 기가 도는 먹색. 액센트: 채도를 낮춘 스틸 블루.
+ * 흰 바탕 위에서 차분하게 읽히는 것을 기준으로 골랐다.
+ */
+@theme {
+  --color-ink: #2a333e;
+  --color-accent: #3d6b94;
+  --color-accent-deep: #2c5170;
+  --color-accent-soft: #f2f6fa;
+  --color-accent-line: #ccdae7;
+}
+
 :root {
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
@@ -8,11 +21,13 @@
 
 html {
   scroll-behavior: smooth;
+  /* 기준 글자 크기. rem 기반인 Tailwind 크기 전체가 함께 커진다 */
+  font-size: 18px;
 }
 
 body {
   background-color: #fff;
-  color: #1e293b;
+  color: #2a333e;
   -webkit-font-smoothing: antialiased;
   word-break: keep-all;
 }

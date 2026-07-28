@@ -1,20 +1,23 @@
 import type { ReactNode } from 'react'
 
-/** 페이지 내 대단원 섹션 */
+/** 페이지 내 대단원 섹션 — no(01, 02…)를 주면 문서식 번호 라벨이 붙는다 */
 export function Section({
   id,
+  no,
   title,
   subtitle,
   children,
 }: {
   id?: string
+  no?: string
   title: string
   subtitle?: string
   children: ReactNode
 }) {
   return (
-    <section id={id} className="scroll-mt-20 py-10 border-t border-slate-100 first:border-t-0">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+    <section id={id} className="scroll-mt-20 py-12 border-t border-slate-200 first:border-t-0">
+      {no && <p className="text-lg font-extrabold tracking-[0.2em] text-accent">{no}</p>}
+      <h2 className="mt-1 text-2xl font-bold text-ink">{title}</h2>
       {subtitle && <p className="mt-2 text-slate-500">{subtitle}</p>}
       <div className="mt-6">{children}</div>
     </section>
@@ -30,7 +33,7 @@ export function SectionNav({ items }: { items: { id: string; label: string }[] }
           <a
             key={item.id}
             href={`#${item.id}`}
-            className="shrink-0 rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-500 transition-colors hover:border-blue-400 hover:text-blue-600"
+            className="shrink-0 rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-500 transition-colors hover:border-accent-line hover:text-accent"
           >
             {item.label}
           </a>
@@ -45,8 +48,8 @@ export function Tag({ children, accent = false }: { children: ReactNode; accent?
   return (
     <span
       className={
-        'inline-block rounded-md px-2.5 py-1 text-sm font-medium ' +
-        (accent ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600')
+        'inline-block rounded-sm px-2.5 py-1 text-sm font-medium ' +
+        (accent ? 'bg-accent-soft text-accent-deep' : 'bg-slate-100 text-slate-600')
       }
     >
       {children}
@@ -86,7 +89,7 @@ export function Figure({
           alt={alt}
           loading="lazy"
           className={
-            'w-full rounded-lg border border-slate-200 bg-white transition-shadow hover:shadow-md ' +
+            'w-full rounded-md border border-slate-200 bg-white transition-shadow hover:shadow-md ' +
             imgClassName
           }
         />
@@ -101,24 +104,24 @@ export function Figure({
 /** 코드 블록 */
 export function CodeBlock({ title, code }: { title?: string; code: string }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200">
+    <div className="overflow-hidden rounded-md border border-slate-200">
       {title && (
         <div className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-500">
           {title}
         </div>
       )}
-      <pre className="overflow-x-auto bg-slate-900 p-4 text-[13px] leading-relaxed text-slate-100">
+      <pre className="overflow-x-auto bg-ink p-4 text-[13px] leading-relaxed text-slate-100">
         <code>{code.trim()}</code>
       </pre>
     </div>
   )
 }
 
-/** 강조 숫자 카드 */
+/** 강조 숫자 */
 export function StatCard({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 px-6 py-5 text-center">
-      <div className="text-3xl font-extrabold text-blue-600">{value}</div>
+    <div className="border-l-2 border-accent-line px-5 py-2">
+      <div className="text-3xl font-extrabold text-accent-deep">{value}</div>
       <div className="mt-1 text-sm text-slate-500">{label}</div>
     </div>
   )
@@ -127,12 +130,12 @@ export function StatCard({ value, label }: { value: string; label: string }) {
 /** 펼치기 (긴 상세 설명은 기본으로 접어 가시성 확보) */
 export function Expand({ summary, children }: { summary: string; children: ReactNode }) {
   return (
-    <details className="group rounded-lg border border-slate-200 bg-slate-50/50">
-      <summary className="flex items-center gap-2 px-4 py-3 font-medium text-slate-600 hover:text-slate-900">
-        <span className="chevron text-blue-500">▶</span>
+    <details className="group rounded-md border border-slate-200 bg-slate-50/50">
+      <summary className="flex items-center gap-2 px-4 py-3 font-medium text-slate-600 hover:text-ink">
+        <span className="chevron text-accent">▶</span>
         {summary}
       </summary>
-      <div className="border-t border-slate-200 px-5 py-4 text-[15px] leading-relaxed text-slate-700">
+      <div className="border-t border-slate-200 px-5 py-4 text-base leading-relaxed text-slate-700">
         {children}
       </div>
     </details>
@@ -145,7 +148,7 @@ export function Bullets({ items }: { items: ReactNode[] }) {
     <ul className="space-y-2">
       {items.map((item, i) => (
         <li key={i} className="flex gap-2.5 leading-relaxed">
-          <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+          <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-line" />
           <span>{item}</span>
         </li>
       ))}
