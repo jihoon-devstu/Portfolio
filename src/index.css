@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fff;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+}
+
+code,
+pre {
+  font-family: "JetBrains Mono", "D2Coding", Consolas, "Courier New", monospace;
+}
+
+/* 펼치기(details) 마커 커스텀 */
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details > summary .chevron {
+  transition: transform 0.2s ease;
+}
+details[open] > summary .chevron {
+  transform: rotate(90deg);
+}
