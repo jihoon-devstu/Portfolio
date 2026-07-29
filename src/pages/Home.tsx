@@ -103,11 +103,11 @@ const STACKS: { group: string; items: string[] }[] = [
   },
   {
     group: 'Frontend',
-    items: ['JavaScript (ES6+)', 'Vue 3', 'React', 'JSP · JSTL', 'HTML5 · CSS3'],
+    items: ['HTML5 · CSS3','JavaScript (ES6+)', 'Vue 3', 'React', 'JSP · JSTL'],
   },
   {
     group: 'Tools · 협업',
-    items: ['Git · GitHub', 'Swagger', 'Notion', 'Slack', 'IntelliJ'],
+    items: ['Git · GitHub', 'Swagger', 'Notion', 'Slack', 'IntelliJ', 'VS Code', 'Eclipse'],
   },
 ]
 
