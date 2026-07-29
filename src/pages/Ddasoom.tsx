@@ -6,12 +6,11 @@ import { Bullets, Expand, Figure, Section, SectionNav } from '../components/ui'
 /** Access / Refresh 토큰 전략 비교 표 */
 function TokenTable() {
   const rows: { label: string; at: string; rt: string }[] = [
-    { label: '클라이언트 저장', at: '프론트 메모리(Zustand), localStorage 금지', rt: 'HttpOnly 쿠키 (JS 접근 불가)' },
-    { label: '서버 저장', at: '없음 (무상태)', rt: 'Redis (refresh:{memberId})' },
-    { label: '전송 방식', at: 'Authorization: Bearer 헤더', rt: '쿠키 자동 전송 (Path=/api/auth 한정)' },
-    { label: '유효 기간', at: '30분', rt: '14일 (재발급 시 슬라이딩 갱신)' },
+    { label: '클라이언트 저장', at: '프론트 메모리(Zustand), localStorage 금지', rt: 'HttpOnly 쿠키' },
+    { label: '서버 저장', at: '없음 (stateless)', rt: 'Redis' },
+    { label: '전송 방식', at: 'Authorization: Bearer 헤더', rt: '쿠키 자동 전송' },
+    { label: '유효 기간', at: '30분', rt: '14일 (rotation)' },
     { label: '무효화 수단', at: 'jti 블랙리스트 + 회원 단위 마커', rt: 'Redis 키 삭제 (로그아웃·탈퇴·제재)' },
-    { label: '탈취 대비', at: '짧은 수명 + XSS 표면 최소화', rt: '로테이션 + SameSite=Lax + Secure' },
   ]
   return (
     <div className="overflow-x-auto rounded-md border border-slate-200">
@@ -40,11 +39,11 @@ function TokenTable() {
 /** JWT 필터 검증 순서 다이어그램 */
 function FilterChainDiagram() {
   const steps = [
-    { title: '① 서명·만료 검증', desc: 'parseClaims: 위조/만료 토큰 즉시 차단', cost: '연산만' },
-    { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: '연산만' },
+    { title: '① 서명·만료 검증', desc: 'parseClaims: 위조/만료 토큰 즉시 차단', cost: 'CPU 연산' },
+    { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: 'CPU 연산' },
     { title: '③ jti 블랙리스트', desc: '로그아웃된 토큰인지 확인', cost: 'Redis 1회' },
     { title: '④ 강제 로그아웃 마커', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
-    { title: '⑤ 인증 객체 구성', desc: 'claims만으로 memberId + role 세팅, DB 조회 0회', cost: 'DB 0회' },
+    { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetail 생성'},
   ]
   return (
     <div className="rounded-md border border-slate-200 bg-slate-50/50 p-5 sm:p-6">
@@ -64,10 +63,6 @@ function FilterChainDiagram() {
           </div>
         ))}
       </div>
-      <p className="mt-4 text-sm text-slate-500">
-        가벼운 검증을 앞에, 비용이 드는 Redis 조회를 뒤에 배치했습니다. Redis 장애 시에는{' '}
-        <b>fail-close</b>로 두어 강제 로그아웃이 장애를 틈타 뚫리지 않게 했습니다.
-      </p>
     </div>
   )
 }
@@ -85,53 +80,89 @@ function Decision({
   no: number
   title: string
   context: ReactNode
-  options: ReactNode[]
+  options: { name: ReactNode; note?: ReactNode; chosen?: boolean }[]
   decision: ReactNode
   tradeoff: ReactNode
   detail?: ReactNode
 }) {
+  /** 라벨 + 본문 한 행. 기준선을 맞춰 줄이 어긋나지 않게 한다. */
   const row = (label: string, body: ReactNode, accent = false) => (
-    <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+    <div
+      className={
+        'flex flex-col gap-1 px-1 py-3.5 sm:flex-row sm:items-baseline sm:gap-5 sm:px-3 ' +
+        (accent ? 'bg-accent-soft/70' : '')
+      }
+    >
       <span
         className={
-          'w-24 shrink-0 pt-px text-sm font-bold ' + (accent ? 'text-accent-deep' : 'text-ink')
+          'w-24 shrink-0 text-sm font-bold ' + (accent ? 'text-accent-deep' : 'text-slate-400')
         }
       >
-        {label}.
+        {label}
       </span>
       <div className="min-w-0 flex-1 leading-relaxed text-slate-700">{body}</div>
     </div>
   )
+  const hasNote = options.some((o) => o.note)
   return (
-    <div className="border-t border-slate-200 pt-6">
-      <div className="flex items-baseline gap-3">
-        <span className="text-sm font-bold text-slate-400">결정 {String(no).padStart(2, '0')}</span>
+    <div>
+      <div className="flex items-baseline gap-3 border-b-2 border-ink pb-3">
+        <span className="shrink-0 text-sm font-bold text-accent">
+          결정 {String(no).padStart(2, '0')}
+        </span>
         <h3 className="text-lg font-bold text-ink">{title}</h3>
       </div>
-      <div className="mt-4 space-y-3.5 sm:pl-8">
-        {row('상황', context)}
-        {row(
-          '검토한 선택지',
-          <ul className="space-y-1.5">
-            {options.map((o, i) => (
-              <li key={i}>{o}</li>
-            ))}
-          </ul>,
-        )}
-        {row('결정과 근거', decision, true)}
-        {row('감수한 것', tradeoff)}
-        {detail && (
-          <details className="group mt-3 rounded-md bg-slate-50">
-            <summary className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-ink">
-              <span className="chevron text-accent">▶</span>
-              결정의 배경 자세히 보기
-            </summary>
-            <div className="space-y-4 px-4 pb-4 text-base leading-relaxed text-slate-700">
-              {detail}
-            </div>
-          </details>
-        )}
+
+      <div className="border-b border-slate-200">{row('상황', context)}</div>
+
+      {/* 검토한 선택지 — 채택한 행만 강조해 무엇을 고르고 무엇을 버렸는지 한눈에 */}
+      <div className="mt-6">
+        <p className="mb-2.5 px-1 text-sm font-bold text-slate-400 sm:px-3">검토한 선택지</p>
+        <div className="overflow-x-auto rounded-md border border-slate-200">
+          <table className={'w-full text-left ' + (hasNote ? 'min-w-[560px]' : 'min-w-[420px]')}>
+            <tbody className="divide-y divide-slate-100">
+              {options.map((o, i) => (
+                <tr key={i} className={o.chosen ? 'bg-accent-soft/70' : ''}>
+                  <td
+                    className={
+                      'px-4 py-3 align-top leading-relaxed ' +
+                      (hasNote ? 'w-2/5 ' : '') +
+                      (o.chosen ? 'font-semibold text-accent-deep' : 'font-medium text-slate-600')
+                    }
+                  >
+                    {o.name}
+                  </td>
+                  {hasNote && (
+                    <td className="px-4 py-3 align-top leading-relaxed text-slate-600">{o.note}</td>
+                  )}
+                  <td className="w-24 px-4 py-3 align-top text-right">
+                    {o.chosen && (
+                      <span className="whitespace-nowrap text-sm font-bold text-accent-deep">
+                        ✓ 채택
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      <div className="mt-6 divide-y divide-slate-100 border-y border-slate-200">
+        {row('채택 방식', decision, true)}
+        {row('감수한 것', tradeoff)}
+      </div>
+
+      {detail && (
+        <details className="group mt-3 rounded-md bg-slate-50">
+          <summary className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-ink">
+            <span className="chevron text-accent">▶</span>
+            상세 내용 및 설계
+          </summary>
+          <div className="space-y-4 px-4 pb-4 leading-relaxed text-slate-700">{detail}</div>
+        </details>
+      )}
     </div>
   )
 }
@@ -145,8 +176,7 @@ export default function Ddasoom() {
         description={
           <>
             유기동물 조회·임시보호·커뮤니티 플랫폼입니다. <b>팀장으로서 회원·보안·공통모듈을
-            담당</b>했고, 이 페이지는 실제로 팀 Notion에 기록한 <b>트레이드오프 문서의 형식(상황 →
-            선택지 → 결정 → 감수한 것)</b> 그대로 정리했습니다.
+            담당</b>하였으며, 이 페이지는 실제로 팀 Notion에 기록하였던 고민거리들을 <b>(상황 → 선택지 → 결정 → 감수한 것)</b> 순서대로 정리했습니다.
           </>
         }
         meta={[
@@ -193,8 +223,8 @@ export default function Ddasoom() {
       >
         <p className="max-w-3xl leading-relaxed text-slate-700">
           Spring Security를 설계한 것은 이번이 처음입니다. 이전 프로젝트의 인증 구현을
-          공부하며 가져오려 하자 <b>멀티탭 경합 같은 문제들이 드러났고</b>, 
-          이를 고민하며 고쳐나간 과정이 아래 결정 로그입니다.
+          공부하며 가져오려 하자 <br/><b>멀티탭 경합 같은 문제들이 드러났고</b>, 
+          이를 고민하며 고쳐나간 과정이 아래 정리하였습니다.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
@@ -234,22 +264,21 @@ export default function Ddasoom() {
               </li>
               <li>
                 · <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">/api/auth/**</code>{' '}
-                와일드카드를 의도적으로 금지하고 엔드포인트를 낱개 등록. auth 하위에 새 API가
-                생겨도 자동 공개되는 사고를 방지
+                와일드카드를 의도적으로 금지하고 엔드포인트를 개별 등록. 
               </li>
               <li>
                 · <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">/api/admin/**</code>{' '}
-                은 ADMIN 자동 잠금. 경로 규칙만 지키면 인가가 따라오는 구조
+                은 ADMIN 자동 잠금. 경로 규칙만 지키면 인가 시스템 활용 가능
               </li>
               <li>
-                · 소셜 가입 직후는 GUEST 롤로 추가 정보 입력 API만 허용하고, 완료 후 USER 승급
+                · 소셜 가입 직후는 GUEST 권한 부여. 추가 정보 입력 API만 허용하고, 완료 후 USER 권한으로 승급
               </li>
               <li>
                 · 미분류 경로는{' '}
                 <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">
                   anyRequest().authenticated()
                 </code>
-                로 수렴시켜, '등록을 깜빡한 경로'가 열리는 일이 없도록
+                를 거치므로 , '등록을 깜빡한 경로' 역시 잠금 처리
               </li>
             </ul>
           </Expand>
@@ -268,67 +297,72 @@ export default function Ddasoom() {
             title="토큰을 어디에 저장할 것인가"
             context={
               <>
-                단순해 보이는 질문이지만, 실제로는 XSS/CSRF 방어, 멀티탭 동시성, 프론트와 백엔드의
-                역할 분담까지 얽힌 문제였습니다.
+                Access Token(이하 AT) 과 Refresh Token(이하 RT) 의 저장 위치에 따라 방어책 및 프론트 / 백의 역할 분담이 달라짐.
               </>
             }
             options={[
-              <>
-                <b>A. AT는 프론트 메모리 + RT는 HttpOnly 쿠키/Redis</b>: CSRF 원천 차단, 도메인
-                제약 없음
-              </>,
-              <>
-                <b>B. AT/RT 모두 HttpOnly 쿠키</b>: 프론트는 편하지만 same-site 배포 전제
-              </>,
-              <>
-                <b>C. AT 쿠키 + 세션만 Redis</b>: 만료된 AT를 갱신 자격증명으로 쓰는 특이한 구현
-              </>,
+              { name: 'A. AT는 프론트 메모리 + RT는 HttpOnly 쿠키/Redis', chosen: true },
+              { name: 'B. AT는 localStorage + RT는 HttpOnly 쿠키/Redis' },
+              { name: 'C. AT/RT 모두 HttpOnly 쿠키' },
             ]}
             decision={
               <>
-                <b>방식 A 채택.</b> localStorage는 XSS 위험으로 금지. AT는 메모리에만, RT는 JS
-                접근이 봉쇄되는 HttpOnly 쿠키에.
+                <b>방식 A 채택.</b>  
+                <br/>B는 AT가 XSS 공격에 취약. 
+                <br/>C는 CSRF 및 CORS 이슈 발생
               </>
             }
             tradeoff={
-              <>프론트가 부트스트랩(로그인 복원)과 401 자동 재발급 인터셉터를 직접 구현.</>
+              <>A 방식의 경우 , 새로고침 시 토큰이 소실되므로 부트스트랩(로그인 복원)과 401 자동 재발급 인터셉터를 구현 해야 함.</>
             }
             detail={
               <p>
                 한 탭 안에서 여러 API가 동시에 401을 받는 경우를 위해 프론트에는 Single-flight
-                패턴(진행 중인 재발급 Promise를 공유)을 적용했고, reissue 요청 자체는 인터셉터가
-                없는 별도 axios 인스턴스로 분리해 재발급 무한 루프 가능성을 구조적으로 차단했습니다.
-                탭 사이의 경합은 서버의 Grace Period가, 탭 안의 경합은 프론트의 Single-flight가
-                흡수하는 이중 구조입니다.
+                패턴(진행 중인 재발급 Promise를 공유)을 적용. 
+                <br/>reissue 요청은 인터셉터가 없는 별도 axios 인스턴스로 분리하여 재발급 무한 루프 가능성 차단.
+                <br/>탭과 탭 사이의 경합은 서버의 Grace Period(30초)가, 한 탭 안에서의 경합은 프론트의 Single-flight가
+                흡수하는 이중 구조 설계로 결정
               </p>
             }
           />
 
           <Decision
             no={2}
-            title="RT 로테이션이 만드는 멀티탭 경합을 어떻게 풀 것인가"
+            title="RT 로테이션 (Reissue) 이 만드는 멀티탭 경합을 어떻게 풀 것인가"
             context={
               <>
                 여러 탭이 같은 구 RT로 동시에 재발급을 요청하면{' '}
-                <b>나머지 탭이 전부 로그아웃되는 경합</b> 발생. 참고하던 프로젝트에서 실제 버그로
-                확인했습니다.
+                <b>나머지 탭이 전부 로그아웃</b> 되는 경합 발생. 
               </>
             }
             options={[
-              <>로테이션만 적용: 단순하지만 멀티탭 로그아웃 버그를 그대로 안게 됨</>,
-              <>
-                로테이션 + <b>Grace Period</b>: 회전 직후의 구 RT를 잠시 보관해 동시 요청을 흡수
-              </>,
-              <>로테이션 + 재사용 탐지: 보안은 강하지만 Grace Period 개념과 정면으로 상충</>,
+              {
+                name: 'A. 로테이션만 적용',
+                note: '단순하지만 멀티탭 로그아웃 버그를 그대로 안게 됨',
+              },
+              {
+                name: (
+                  <>
+                    B. 로테이션 + <b>Grace Period</b>
+                  </>
+                ),
+                note: '회전 직후의 구 RT를 잠시 Redis에 같이 보관하여 동시 요청을 흡수',
+                chosen: true,
+              },
+              {
+                name: 'C. 로테이션 + 재사용 탐지',
+                note: '보안은 강하지만 Grace Period 개념과 정면으로 상충',
+              },
             ]}
             decision={
               <>
-                <b>30초 Grace Period 채택.</b> 구 RT를 별도 키(TTL 30초)로 보관해 뒤늦은 탭은 새
-                AT만 발급. 회전 체인 방지를 위해 <b>재회전은 금지</b>.
+                <b>방식 B 채택 </b> 
+                <br/>구 RT를 별도 키인 Grace Period(TTL 30초)로 보관해 뒤늦은 탭은 새 AT만 발급. 
+                <br/>회전 체인 방지를 위해 <b>재회전은 금지</b>.
               </>
             }
             tradeoff={
-              <>30초 창의 구 RT 재사용 여지. 새 AT 발급만 가능해 피해 범위는 한정됩니다.</>
+              <> 구 RT 탈취 시 , Grace Period 의 TTL인 30초 간 재사용 여지. 새 AT 발급만 가능해 피해 범위는 한정됩니다.</>
             }
           />
 
@@ -337,16 +371,26 @@ export default function Ddasoom() {
             title="관리자가 제재한 회원을 '즉시' 차단할 수 있는가"
             context={
               <>
-                강제탈퇴해도 <b>기발급 AT는 최대 30분간 유효</b>. 관리자는 대상의 AT를 알 수 없어
-                jti 블랙리스트(토큰 단위 차단)를 적용할 수 없었습니다.
+                강제탈퇴해도 <b>기존에 발급한 AT는 최대 30분간 유효</b>. 관리자는 대상의 AT를 알 수 없어 블랙리스트 등록 불가능
               </>
             }
             options={[
-              <>AT 자연 만료까지 대기: 제재의 실효성이 떨어지는 공백</>,
-              <>매 요청 DB 상태 조회: 확실하지만 무상태 설계의 이점을 전부 포기</>,
-              <>
-                <b>회원 단위 차단 키</b>: forceLogout:{'{memberId}'} 마커를 AT 최대 수명만큼 보관
-              </>,
+              { name: 'A. AT 자연 만료까지 대기', note: '30분간 자유롭게 활동 가능' },
+              {
+                name: 'B. 매 요청 DB 상태 조회',
+                note: '확실하지만 무상태 설계의 이점을 전부 포기',
+              },
+              {
+                name: (
+                  <>
+                    C. <b>회원 단위 차단 키</b>
+                  </>
+                ),
+                note: (
+                  <>forceLogout:{'{memberId}'} 마커를 Redis에 AT 최대 수명만큼 보관</>
+                ),
+                chosen: true,
+              },
             ]}
             decision={
               <>
@@ -356,14 +400,6 @@ export default function Ddasoom() {
             }
             tradeoff={
               <>요청당 Redis 조회 1회 → 2회. 적용 범위는 강제탈퇴·제재로 최소화.</>
-            }
-            detail={
-              <p>
-                이후 제재(숨김) 처리에서 상태 컬럼만 바꾸면 기존 세션이 유지되고 RT 슬라이딩
-                갱신으로 사실상 무기한 활동이 가능하다는 허점을 추가로 발견해, 탈퇴에 쓰던
-                인프라(RT 삭제 + 마커)를 재사용해 제재도 동일하게 즉시 차단되도록 통일했습니다.
-                복구 시에는 마커를 해제합니다.
-              </p>
             }
           />
         </div>
@@ -518,20 +554,18 @@ export default function Ddasoom() {
         <Bullets
           items={[
             <>
-              <b>ApiResponse</b>: 모든 응답을 단일 규격으로 통일. 필터 레벨 401/403도
-              EntryPoint/AccessDeniedHandler가 같은 규격으로 응답
+              <b>ApiResponse</b>: 모든 응답을 단일 규격으로 통일하여 프론트와의 연계성 고려
             </>,
             <>
-              <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 예외를 3단 구조로 정리해 팀원
-              누구의 코드에서든 일관된 에러 응답 보장
+              <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 일관된 에러 응답 고려
             </>,
             <>
-              <b>PageableSanitizer</b>: 전 도메인 목록 API의 정렬 프로퍼티 주입과 size 무제한
-              조회를 발견하고, 화이트리스트 + 상한 클램프 유틸을 만들어 13개 컨트롤러에 일괄 적용
+              <b>PageableSanitizer</b>: size , sort 등이 비정상적인 요청이 들어올 수 있음을 고려. 
+              화이트리스트 + 상한 클램프 유틸을 만들어 13개 컨트롤러에 일괄 적용
             </>,
             <>
-              <b>문서 우선 협업</b>: 코드·DB·보안 컨벤션을 문서로 관리하고 규칙 변경은 문서 PR로만.
-              트러블슈팅과 트레이드오프도 Notion에 축적해 팀의 판단 근거를 공유 (PR 100건 운영)
+              <b>문서 우선 협업</b>: 1. 코드·DB·보안 컨벤션을 문서로 관리하여 프로잭트 안에서 공유.
+              2. 트러블슈팅/트레이드오프/작업요청/라이브러리 도입 가이드 등을 Notion에 축적하여 문서화 된 작업 지향
             </>,
           ]}
         />
@@ -540,7 +574,7 @@ export default function Ddasoom() {
         <div className="mt-8">
           <h3 className="mb-3 font-bold text-ink">직접 작성한 설계 문서</h3>
           <p className="mb-4 text-base text-slate-600">
-            '규칙을 문서로 먼저 정한다'는 말의 실체입니다. 세 문서 모두 저장소에 공개되어 있습니다.
+            백앤드 프로잭트의 docs 폴더 안에 들어있는 컨벤션 및 가이드라인 문서 입니다.
           </p>
           <div className="grid gap-3 lg:grid-cols-3">
             {[
@@ -596,31 +630,38 @@ export default function Ddasoom() {
       </Section>
 
       <Section id="retrospect" no="08" title="성과와 배운 점">
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-0">
-          <div className="sm:pr-8">
+        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
+          <div className="border-t-2 border-accent-line pt-4">
             <h3 className="font-bold text-ink">이 프로젝트가 남긴 것</h3>
-            <ul className="mt-3 space-y-2.5 leading-relaxed text-slate-700">
-              <li>· 토큰 수명 주기 전체(발급 → 재발급 → 무효화)를 경계 상황까지 정의하며 설계</li>
-              <li>
-                · <b>참고 구현을 그대로 믿지 않는 습관.</b> 공부하며 문제(멀티탭 경합)를 발견하고
-                고쳐서 적용했습니다
-              </li>
-              <li>· 모든 결정의 '왜'를 선택지·근거와 함께 문서로 남기는 협업</li>
-            </ul>
+            <div className="mt-3 text-slate-700">
+              <Bullets
+                items={[
+                  <>Spring Security 기반의 인증 / 인가 인프라 직접 구현 경험</>,
+                  <>
+                    AT / RT 의 저장 및 재발급 방식에 따른 각각의 트러블 슈팅과 공격 상황에 대한 고민
+                    과 성장
+                  </>,
+                  <>모든 결정을 선택지·근거와 함께 문서로 남기는 협업 경험</>,
+                ]}
+              />
+            </div>
           </div>
-          <div className="border-t border-slate-200 pt-6 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
+          <div className="border-t-2 border-slate-300 pt-4">
             <h3 className="font-bold text-ink">마치고 나서 이어진 고민</h3>
-            <ul className="mt-3 space-y-2.5 leading-relaxed text-slate-700">
-              <li>
-                · Fantry에서 <b>Redis 장애 대비(Fallback)</b>를 배웠지만 이번 인증 설계에는 적용하지
-                못했습니다. Redis가 멈추면 재발급과 차단 확인도 함께 멈춥니다. fail-close로 보안은
-                지켰지만, 가용성까지 확보하는 Fallback 설계가 다음 고민입니다
-              </li>
-              <li>
-                · RT 재사용 탐지는 Grace Period와 상충해 의도적으로 제외했습니다. 두 개념을 함께
-                가져가는 방법이 남은 고민입니다
-              </li>
-            </ul>
+            <div className="mt-3 text-slate-700">
+              <Bullets
+                items={[
+                  <>
+                    RT 재사용 탐지는 Grace Period와 상충해 의도적으로 제외하였으나 , 함께 도입할 수
+                    있는 방법에 대한 고민
+                  </>,
+                  <>
+                    Spring Security 도 라이브러리를 도입하여 직접 구현하지 않는 방식에 대한 추가
+                    학습 필요
+                  </>,
+                ]}
+              />
+            </div>
           </div>
         </div>
       </Section>

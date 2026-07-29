@@ -24,7 +24,7 @@ function BidFlowDiagram() {
         </div>
         {arrow}
         <div className={`${box} border-accent-line bg-accent-soft text-accent-deep`}>
-          Redis Lua Script — 원자적 연산
+          Redis Lua Script — 원자적 연산 (트랜잭션 효과)
           <div className="mt-1 text-sm font-normal text-accent">
             최고가 조회 → 검증 → 갱신을 단일 스크립트로 처리 (Race Condition 차단)
           </div>
@@ -38,7 +38,7 @@ function BidFlowDiagram() {
             </div>
           </div>
           <div className={`${box} border-slate-300 bg-white`}>
-            In-memory Queue 적재
+            In-memory Queue 에 Bid 객체 적재
             <div className="mt-1 text-sm font-normal text-slate-500">
               LinkedBlockingQueue → 2초 주기 Batch Insert
             </div>
@@ -48,7 +48,7 @@ function BidFlowDiagram() {
           <div className={`${box} border-dashed border-slate-400 bg-white text-slate-700`}>
             ⚠ Redis 장애 감지 시 — DB Fallback Mode
             <div className="mt-1 text-sm font-normal text-slate-500">
-              비관적 락(SELECT ... FOR UPDATE)으로 전환, 복구 시 자가 치유
+              DB기준 입찰 처리 (비관적 락 도입) 로 전환, 복구 시 자가 치유
             </div>
           </div>
         </div>
@@ -65,12 +65,13 @@ export default function Fantry() {
         tagline="Project 01 · 실시간 중고 경매 플랫폼"
         description={
           <>
-            전문가 검수와 실시간 경매를 결합한 아이돌 굿즈 경매 플랫폼입니다.{' '}
+            전문가 검수와 실시간 경매를 결합한 아이돌 굿즈 경매 플랫폼입니다.
+            <br/>{' '}
             <b>실시간 경매 시스템(ERD·백엔드·프론트)을 총괄 담당</b>했습니다.
           </>
         }
         meta={[
-          { label: '기간', value: '2025.09 – 2025.10 (실 개발 약 3주)' },
+          { label: '기간', value: '2025.09 – 2025.10 (약 3주)' },
           { label: '팀 구성', value: 'Full Stack 5명' },
           { label: '담당', value: '실시간 경매 시스템 총괄' },
           { label: '검증', value: 'K6 동시 입찰 시나리오 통과' },
@@ -105,20 +106,17 @@ export default function Fantry() {
 
       <Section id="why" no="01" title="왜 이 프로젝트인가">
         <p className="max-w-3xl leading-relaxed text-slate-700">
-          <b>DB 트랜잭션 기반으로 기본 동작부터 구현</b>한 뒤, 배포 환경과 부하 상황을 가정하자
-          질문들이 생겼습니다.
+          <b>기본 동작부터 구현</b>한 뒤, 실제 서비스 환경을 가정하자
+          고민들이 생겼습니다.
         </p>
 
         {/* 당시 실제로 기록해 뒀던 고민들 — 이 질문들이 이후 고도화의 출발점이 됐다 */}
         <div className="mt-6 max-w-3xl border-l-2 border-accent-line pl-5 sm:pl-6">
-          <p className="text-sm font-bold uppercase tracking-widest text-slate-400">
-            당시 스스로에게 던진 질문
-          </p>
           <ul className="mt-3 space-y-2.5 text-base leading-relaxed text-slate-700">
-            <li>1. 입찰마다 DB에 접근(최고가 조회/검증/갱신)하면 I/O 병목이 생기지 않는가?</li>
-            <li>2. 성능 최적화를 위해 In-memory DB인 Redis를 연동할 수는 없는가?</li>
+            <li>1. 입찰 시도마다 DB에 접근(최고가 조회/검증/갱신)하면 무리가 가지 않는가?</li>
+            <li>2. 성능 최적화를 위해 Redis를 연동할 수는 없는가?</li>
             <li>3. 동시성(Race Condition) 문제는 어떻게 해결할 것인가?</li>
-            <li>4. 입찰은 로그인 유저만 가능해야 하는데, WebSocket 인증/인가는 어떻게 구현하는가?</li>
+            <li>4. 입찰은 로그인 유저만 가능해야 하는데, WebSocket 연결시 JWT는 어떻게 연동하는가?</li>
           </ul>
         </div>
 
@@ -142,7 +140,7 @@ export default function Fantry() {
         id="architecture"
         no="02"
         title="입찰 처리 아키텍처"
-        subtitle="검증은 Redis에서 원자적으로, 영속화는 큐를 거쳐 비동기 배치로 처리합니다."
+        subtitle="검증은 Redis에서, DB저장은 Spring Queue 를 거쳐 비동기 배치로 처리합니다."
       >
         <BidFlowDiagram />
       </Section>
@@ -153,12 +151,13 @@ export default function Fantry() {
             no={1}
             title="배포 환경에서 WebSocket이 Long-Polling으로 강등"
             problem={
-              <>Local에서는 WebSocket, 배포 환경에서만 Long-Polling으로 강등.</>
+              <>로컬 환경에서는 WebSocket이 잘 연결 되는데, 배포 환경에서는 연결이 되지 않음.</>
             }
             cause={
               <>
-                WebSocket 핸드셰이크는 <b>프로토콜 Upgrade 요청</b>인데, Nginx가 Upgrade 헤더를
-                전달하지 않아 SockJS Fallback이 동작. (
+                WebSocket 연결 요청은 <b>HTTP - WebSocket 프로토콜 Upgrade 요청</b>인데, 
+                Nginx가 Upgrade 헤더를 전달하지 않았음.
+                <br/> 그 결과 , SockJS Fallback이 동작하여 Long-Polling 연결로 강등. (
                 <a
                   href="https://docs.spring.io/spring-framework/reference/web/websocket/fallback.html"
                   target="_blank"
@@ -171,10 +170,10 @@ export default function Fantry() {
               </>
             }
             solution={
-              <>Nginx에 Upgrade / Connection 헤더 전달 설정 추가. (DevOps 팀원과 협업)</>
+              <>Nginx에 Upgrade / Connection 헤더 전달 설정 추가 요청. (DevOps 팀원과 협업)</>
             }
             result={
-              <>순수 WebSocket 연결 정상화. 인프라와 프로토콜의 상호작용을 처음 체감했습니다.</>
+              <>배포 환경에서도 순수 WebSocket 연결 정상화. </>
             }
             detail={
               <Figure
@@ -196,15 +195,14 @@ export default function Fantry() {
             }
             cause={
               <>
-                '조회 → 비교 → 쓰기'는 요청이 겹치면 낮은 입찰가가 최고가를 덮어쓸 수 있는
-                구조(lost update).
+                Redis 는 싱글 스레드 이기에 '조회 → 비교 → 쓰기' 요청이 겹치면 Race Condition 문제 발생 
               </>
             }
             solution={
               <>
-                Redis는 여러 명령을 트랜잭션처럼 묶을 수 없다는 벽을 만났고, 싱글 스레드가{' '}
-                <b>Lua Script를 하나의 원자 연산으로 실행</b>하는 특성을 찾아 조회/검증/갱신을
-                스크립트 하나로 처리. 입찰 기록은 큐에 모아 2초 주기 Batch Insert.
+                Redis 에서도 트랜잭션 효과를 낼 수 있는{' '}
+                <b>Lua Script</b>를 도입하여 조회/검증/갱신을
+                스크립트 하나로 처리. <br/>입찰 기록은 큐에 모아 2초 주기로 DB에 Batch Insert.
               </>
             }
             result={<>K6 동시 입찰 시나리오 2,079개 검증 항목 전체 통과. (실패 0건)</>}
@@ -242,18 +240,15 @@ public void flushBidLogToDB() {
 }`}
                 />
                 <p>
-                  배치 주기 2초는 레퍼런스들을 조사해 정한 값입니다. 이 정도 주기의 일괄 INSERT가
-                  DB에 주는 부하는 크지 않다고 판단했습니다. 경매 마감 스케줄러는 낙찰자 확정
-                  직전에 큐를 강제 flush하여, 큐에 남아 있던 입찰이 낙찰 판정에서 누락되지 않도록
-                  했습니다.
+                  경매 마감 스케줄러는 낙찰자 확정 직전에 큐를 강제 flush.
+                  <br/> 큐에 남아 있던 입찰이 낙찰 판정에서 누락되지 않도록 처리.
                 </p>
                 <div>
                   <p className="mb-3">
-                    <b>검증 방법</b>: 초당 15회(15 RPS)로 동시 입찰 요청을 지속 발생시키며 요청당
-                    3단계 체크(HTTP 로그인 → WebSocket 연결 → STOMP 연결)를 수행했습니다. 총
-                    2,079개 검증 항목이 전부 통과했고, 입찰 정합성은 Lua 스크립트가 검증과 갱신을
-                    단일 원자 연산으로 처리하는 구조로 보장됩니다. 처리량 측정이 아닌{' '}
-                    <b>동시 요청 환경에서의 안정성 검증</b>이 목적인 시나리오였습니다.
+                    <b>검증 방법</b>: 초당 15회로 동시 입찰 요청을 지속 발생시키며
+                    3단계 체크(HTTP 로그인 → WebSocket 연결 → STOMP 연결) 수행 
+                    <br/> <b>결과:</b> 총 2,079개 검증 항목이 전부 통과. (Lua Script 가 트랜잭션과 동일한 효과를 내므로 정합성 보장)
+                    
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <StatCard value="2,079개" label="검증 항목(checks) 전체 통과" />
@@ -278,19 +273,19 @@ checks_failed......: 0.00%    0 out of 2079
 
           <TroubleCard
             no={3}
-            title="Redis가 죽으면 경매도 죽는가: DB Fallback Mode"
+            title="Redis 서버가 다운된다면 ?"
             problem={
-              <>최고가 처리를 Redis로 이관하자 <b>Redis가 단일 장애 지점(SPOF)</b>이 됨.</>
+              <>Redis는 외부 서버이기 때문에 ,  <b>단일 장애 지점(SPOF)</b>이 될 위험이 있음.</>
             }
-            cause={<>입찰 경로 전체가 Redis에 의존해, 커넥션 장애가 곧 입찰 불가.</>}
+            cause={<>입찰 경로 전체가 Redis에 의존하여, Redis 가 다운되면 기능 전체가 마비.</>}
             solution={
               <>
-                장애 감지 시 <b>DB 비관적 락</b>으로 분기(Fallback), 복구 시 Redis 재동기화 후
-                자동 복귀(자가 치유).
+                Redis 서버 장애 감지 시 <b>DB Fallback mode 돌입</b>( 동시성 제어를 위한 비관적 락 처리), 
+                <br/> Redis 서버 복구 시 이를 감지하여 DB와 Redis 를 동기화(자가 치유) 후 Redis 를 이용한 입찰 기능 자동 회복하도록 설계.
               </>
             }
             result={
-              <>Redis 장애 중에도 입찰이 계속되고, 수동 개입 없이 정상 모드로 복귀합니다.</>
+              <>Redis 서버가 다운되어도 , DB만을 활용한 입찰이 계속되고, Redis 서버 정상 작동을 감지하여 정상 모드로 복귀합니다.</>
             }
             detail={
               <Figure
@@ -307,46 +302,52 @@ checks_failed......: 0.00%    0 out of 2079
         <Bullets
           items={[
             <>
-              <b>JWT 기반 WebSocket 인증/인가</b>: STOMP 핸드셰이크 시점에 JWT를 전달해 인가된
-              세션만 입찰 가능하도록 구현
+              <b>JWT 기반 WebSocket 인증/인가</b>: WebSocket 연결 시 단 한순간 있는 Http 요청(핸드셰이크) 시점에 JWT 유무를 판단 및 전달하도록 구현
             </>,
             <>
               <b>@Scheduled 기반 경매 라이프사이클</b>: 경매 자동 활성화/마감과 낙찰 확정, 주문
-              자동 생성
-            </>,
-            <>
-              <b>트랜잭션 커밋 이후 비동기 알림</b>: AFTER_COMMIT + @Async로 낙찰 알림(SSE)을
-              분리해 마감 트랜잭션과 격리
+              자동 생성 및 2초주기 입찰 요청 Bulk insert 구현
             </>,
           ]}
         />
       </Section>
 
       <Section id="retrospect" no="05" title="성과와 배운 점">
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-0">
-          <div className="sm:pr-8">
+        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
+          <div className="border-t-2 border-accent-line pt-4">
             <h3 className="font-bold text-ink">이 프로젝트가 남긴 것</h3>
-            <ul className="mt-3 space-y-2.5 leading-relaxed text-slate-700">
-              <li>
-                · <b>외부 시스템은 언제든 장애가 날 수 있다</b>는 전제를 배웠습니다. 그 대비의
-                결과물이 DB Fallback과 자가 치유입니다
-              </li>
-              <li>
-                · <b>Redis의 특성</b>(싱글 스레드, Lua Script 원자 실행)을 이해하고 동시성 제어에
-                활용했습니다
-              </li>
-              <li>· 설계는 수치로 검증했습니다. K6 동시 입찰 2,079개 항목 전체 통과</li>
-            </ul>
+            <div className="mt-3 text-slate-700">
+              <Bullets
+                items={[
+                  <>
+                    <b>외부 시스템은 언제든 장애가 날 수 있다</b>는 전제를 배웠습니다. 따라서 장애
+                    대비책이 항상 마련되어있어야 겠다는 점을 배웠습니다.
+                  </>,
+                  <>
+                    <b>Redis의 특성</b>(싱글 스레드)을 각 요청이 원자적이라는 것을 배웠으며 동시성
+                    제어를 조금이나마 다뤄볼 수 있었습니다
+                  </>,
+                ]}
+              />
+            </div>
           </div>
-          <div className="border-t border-slate-200 pt-6 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
+          <div className="border-t-2 border-slate-300 pt-4">
             <h3 className="font-bold text-ink">마치고 나서 이어진 고민</h3>
-            <ul className="mt-3 space-y-2.5 leading-relaxed text-slate-700">
-              <li>
-                · Queue와 Fallback Flag는 메모리에 있어 서버가 내려가면 사라집니다. Kafka 같은
-                외부 브로커로 옮기면 해결되지만, 이번엔 <b>그 브로커의 장애 대비를 다시 고민</b>
-                해야 합니다. 도입은 끝이 아니라 새로운 트레이드오프의 시작임을 배웠습니다
-              </li>
-            </ul>
+            <div className="mt-3 text-slate-700">
+              <Bullets
+                items={[
+                  <>Queue 는 Redis 와 마찬가지로 Inmemory 에 저장되기 때문에 휘발성을 가집니다.</>,
+                  <>
+                    Kafka 나 RabbitMQ 같은 외부 브로커로 옮길 수 있다는 확장성이 있지만{' '}
+                    <b>그 브로커의 장애 대비를 다시 고민</b>해야 합니다.
+                  </>,
+                  <>
+                    위와 같은 고민에서 확장성과 비용 사이에서 Devops 전반에 걸친 트레이드오프를
+                    고민하는 기회가 되었습니다.
+                  </>,
+                ]}
+              />
+            </div>
           </div>
         </div>
       </Section>

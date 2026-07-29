@@ -4,13 +4,28 @@ import { Bullets, CodeBlock, Figure, Section } from '../components/ui'
 
 /** 루트-탑-서브 3단계 카테고리 구조 다이어그램 */
 function CategoryDiagram() {
-  const table = (name: string, cols: string[], color: string) => (
+  type Col = { col: string; key?: 'PK' | 'FK' }
+  const table = (name: string, cols: Col[], color: string) => (
     <div className={`rounded-md border bg-white ${color}`}>
-      <div className="border-b border-inherit px-3 py-2 text-base font-bold">{name}</div>
-      <ul className="px-3 py-2 text-sm leading-relaxed text-slate-500">
+      <div className="border-b border-inherit px-3 py-2.5 font-bold">{name}</div>
+      <ul className="space-y-1 px-3 py-2.5 text-sm leading-relaxed">
         {cols.map((c) => (
-          <li key={c} className={c.includes('FK') ? 'font-semibold text-slate-700' : ''}>
-            {c}
+          <li key={c.col} className="flex items-center justify-between gap-2">
+            <span className={c.key === 'FK' ? 'font-semibold text-slate-700' : 'text-slate-500'}>
+              {c.col}
+            </span>
+            {c.key && (
+              <span
+                className={
+                  'shrink-0 rounded px-1.5 text-[11px] font-bold ' +
+                  (c.key === 'PK'
+                    ? 'bg-slate-100 text-slate-500'
+                    : 'bg-accent-soft text-accent-deep')
+                }
+              >
+                {c.key}
+              </span>
+            )}
           </li>
         ))}
       </ul>
@@ -18,35 +33,58 @@ function CategoryDiagram() {
   )
   const arrow = <div className="flex items-center justify-center text-lg text-slate-300">→</div>
   return (
-    <div className="rounded-md border border-slate-200 bg-slate-50/50 p-5 sm:p-8">
-      <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-7">
-        {table('root_categories', ['root_category_id (PK)', 'category_name'], 'border-accent-line')}
+    <div className="rounded-md border border-slate-200 bg-slate-50/50 p-5 sm:p-6">
+      <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]">
+        {table(
+          'root_categories',
+          [{ col: 'root_category_id', key: 'PK' }, { col: 'category_name' }],
+          'border-accent-line',
+        )}
         {arrow}
         {table(
           'top_categories',
-          ['top_category_id (PK)', 'category_name', 'root_category_id (FK)'],
+          [
+            { col: 'top_category_id', key: 'PK' },
+            { col: 'category_name' },
+            { col: 'root_category_id', key: 'FK' },
+          ],
           'border-accent-line',
         )}
         {arrow}
         {table(
           'sub_categories',
-          ['sub_category_id (PK)', 'category_name', 'top_category_id (FK)'],
+          [
+            { col: 'sub_category_id', key: 'PK' },
+            { col: 'category_name' },
+            { col: 'top_category_id', key: 'FK' },
+          ],
           'border-accent-line',
         )}
         {arrow}
-        {table('products', ['product_id (PK)', 'sub_category_id (FK)', '…'], 'border-slate-300')}
-      </div>
-      <div className="mx-auto mt-6 max-w-md">
         {table(
-          'store_categories — 스토어 ↔ 서브 카테고리 N:M 매핑',
-          ['store_category_id (PK)', 'store_info_id (FK)', 'sub_category_id (FK)'],
+          'products',
+          [{ col: 'product_id', key: 'PK' }, { col: 'sub_category_id', key: 'FK' }, { col: '…' }],
           'border-slate-300',
         )}
       </div>
+      <div className="mx-auto mt-6 max-w-sm">
+        {table(
+          'store_categories',
+          [
+            { col: 'store_category_id', key: 'PK' },
+            { col: 'store_info_id', key: 'FK' },
+            { col: 'sub_category_id', key: 'FK' },
+          ],
+          'border-slate-300',
+        )}
+        <p className="mt-2 text-center text-sm text-slate-500">
+          스토어 ↔ 서브 카테고리 N:M 매핑
+        </p>
+      </div>
       <ul className="mt-6 space-y-1.5 text-sm leading-relaxed text-slate-600">
-        <li>· 상품은 카테고리 계층 어디에나 붙는 게 아니라 <b>항상 말단(sub)에만</b> 연결. 소속의 모호함 제거</li>
+        <li>· 상품은 카테고리 계층 어디에나 붙는 게 아니라 <b>항상 최하단(sub)에만</b> 연결.</li>
         <li>· 판매자별 취급 카테고리는 <b>매핑 테이블(store_categories)</b>로 분리. 스토어마다 다른 카테고리 트리 제공</li>
-        <li>· 계층이 3단계로 고정된 도메인이므로, 셀프 조인(재귀) 대신 <b>단계별 테이블 분리</b>를 선택. 쿼리가 단순하고 의도가 명확</li>
+        <li>· 계층이 3단계로 고정된 도메인이므로, 쿼리가 단순해 지도록 <b>단계별 테이블 분리</b>를 선택. </li>
       </ul>
     </div>
   )
@@ -119,7 +157,7 @@ export default function IntelliMarket() {
           title="카테고리 계층 조회의 N+1: 중첩 select를 JOIN + 중첩 resultMap으로"
           problem={
             <>
-              판매자 카테고리 트리를 조회할 때 응답이 눈에 띄게 느렸습니다. 로그를 확인하니{' '}
+              판매자 카테고리 트리를 조회할 때 응답이 다른 조회에 비해 느린 점을 확인하였습니다. 로그를 확인하니{' '}
               <b>서브 카테고리 1건을 읽을 때마다 상위 카테고리 조회 쿼리가 연쇄적으로 추가 실행</b>
               되고 있었습니다.
             </>
@@ -186,9 +224,8 @@ ORDER BY root.category_name, top.category_name, sub.category_name
               관리
             </>,
             <>
-              <b>어드민 카테고리 트리 그룹핑</b>: JOIN으로 정렬된 평면 데이터를 가져와 서비스
-              계층에서 Stream과 LinkedHashMap으로 '상위 → 하위 목록' 구조로 조립. SQL과 자바 컬렉션
-              중 어느 쪽에서 가공할지 판단해 본 경험
+              <b>어드민 카테고리 그룹화</b>: JOIN으로 정렬된 데이터를 가져와 서비스
+              계층에서 Stream과 LinkedHashMap으로 '상위 → 하위 목록' 구조로 조립. 
             </>,
           ]}
         />
@@ -202,10 +239,9 @@ ORDER BY root.category_name, top.category_name, sub.category_name
 
       <Section id="retrospect" no="05" title="회고">
         <p className="max-w-3xl leading-relaxed text-slate-700">
-          완성하고 돌아보니 트랜잭션 경계, 재고 차감, 입력 검증 등 당시에는 보이지 않던 한계가
-          많았습니다. 이 한계들을 인지한 것이 이후의 학습 방향이 됐습니다. 동시성에 대한 관심은
-          Fantry의 입찰 설계로, '클라이언트는 신뢰할 수 없다'는 원칙은 Ddasoom의 검증 이중화로
-          이어졌습니다.
+          완성하고 돌아보니 트랜잭션 경계, 재고 차감, 입력 검증 등 당시에는 보이지 않던 한계가 많았습니다. <br/>
+          <b>'클라이언트는 신뢰할 수 없다. 따라서 API는 그 어떤 상황에도 대비하여야된다.'</b>
+          <br/>라는 점을 다시 한번 마음에 새기게 되었습니다. 
         </p>
       </Section>
     </>

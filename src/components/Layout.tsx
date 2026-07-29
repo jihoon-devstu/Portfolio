@@ -30,14 +30,14 @@ export default function Layout() {
           <Link to="/" className="font-bold text-ink">
             구지훈<span className="ml-2 hidden text-sm font-medium text-slate-400 sm:inline">Backend Developer</span>
           </Link>
-          <nav className="flex items-center gap-3 sm:gap-5">
+          <nav className="flex items-center gap-2 sm:gap-5">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
                 className={({ isActive }) =>
-                  'border-b-2 px-1 pb-0.5 text-sm font-medium transition-colors sm:px-1.5 ' +
+                  'border-b-2 px-0.5 pb-0.5 text-xs font-medium transition-colors sm:px-1.5 sm:text-sm ' +
                   (isActive
                     ? 'border-accent text-ink'
                     : 'border-transparent text-slate-500 hover:text-ink')

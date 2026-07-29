@@ -142,14 +142,14 @@ export function Expand({ summary, children }: { summary: string; children: React
   )
 }
 
-/** 불릿 리스트 (본문용) */
+/** 불릿 리스트 (본문용) — 점을 첫 줄 중앙에 맞추고, 줄바꿈 시 본문이 첫 글자에 정렬된다 */
 export function Bullets({ items }: { items: ReactNode[] }) {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2.5">
       {items.map((item, i) => (
         <li key={i} className="flex gap-2.5 leading-relaxed">
-          <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-line" />
-          <span>{item}</span>
+          <span className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-line" />
+          <span className="min-w-0">{item}</span>
         </li>
       ))}
     </ul>

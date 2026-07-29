@@ -73,19 +73,19 @@ const CERTIFICATES = [
 const CORE_SKILLS = [
   {
     title: '동시성 제어와 성능',
-    desc: '실시간 입찰 기능 구현 단계에서 Race Condition과 DB I/O 병목을 마주하고, Redis Lua Script와 큐 기반 Batch Insert를 공부해 적용했습니다.',
+    desc: '실시간 입찰에서 여러 요청이 같은 값을 동시에 고치는 문제를 만났습니다. 락 없이 안전하게 처리하는 방법과, 쓰기를 모아 부하를 줄이는 방법을 공부해 적용했습니다.',
     tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'Batch Insert'],
     from: 'Fantry에서 경험',
   },
   {
     title: '인증과 보안 설계',
-    desc: 'JWT 이중 토큰 전략을 설계하며 토큰 탈취, 멀티탭 경합 같은 경계 상황을 정의하고 결정 근거를 문서로 남겼습니다.',
+    desc: '로그인이 되게 만드는 것에서 멈추지 않고, 토큰이 탈취되면 어떻게 되는지까지 정의했습니다. 선택지와 근거는 모두 문서로 남겼습니다.',
     tags: ['Spring Security', 'JWT · OAuth2', 'Redis TTL 설계'],
     from: 'Ddasoom에서 경험',
   },
   {
     title: '데이터 모델링과 쿼리',
-    desc: 'ERD 설계와 N+1 문제의 진단·개선을 경험하며, 실행되는 SQL을 항상 확인하는 습관을 들였습니다.',
+    desc: '목록 하나를 부르는데 쿼리가 수십 번 나가는 문제를 겪은 뒤로, 코드가 만들어내는 SQL을 눈으로 확인하는 습관이 생겼습니다.',
     tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
     from: 'intelliMarket · Ddasoom에서 경험',
   },
