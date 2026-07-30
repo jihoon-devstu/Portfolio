@@ -50,7 +50,7 @@ const TIMELINE: {
   {
     period: '2025.11 – 2026.04',
     title: '개선 방향 학습 · 자격증 준비',
-    desc: '이전 프로젝트가 남긴 한계(메시지 브로커 등)의 개선 방향 학습, SQLD·정보처리기사 준비',
+    desc: '이전 프로젝트가 남긴 한계의 개선 방향 학습, SQLD·정보처리기사 준비',
     highlight: false,
   },
   {
@@ -73,20 +73,20 @@ const CERTIFICATES = [
 const CORE_SKILLS = [
   {
     title: '동시성 제어와 성능',
-    desc: '실시간 입찰에서 여러 요청이 같은 값을 동시에 고치는 문제를 만났습니다. 락 없이 안전하게 처리하는 방법과, 쓰기를 모아 부하를 줄이는 방법을 공부해 적용했습니다.',
+    desc: '실시간 경매 시스템 구현에서 동시성 제어가 필요하다는 것을 실감하였습니다. 데이터의 정합성이 깨지지 않도록 안전하지만 성능 좋게 처리하는 방법을 공부해 적용했습니다.',
     tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'Batch Insert'],
     from: 'Fantry에서 경험',
   },
   {
     title: '인증과 보안 설계',
-    desc: '로그인이 되게 만드는 것에서 멈추지 않고, 토큰이 탈취되면 어떻게 되는지까지 정의했습니다. 선택지와 근거는 모두 문서로 남겼습니다.',
+    desc: '로그인이 되게 만드는 것에서 멈추지 않고 토큰의 저장 위치 , 인증/인가 체계를 고민하며 개발하였습니다.',
     tags: ['Spring Security', 'JWT · OAuth2', 'Redis TTL 설계'],
     from: 'Ddasoom에서 경험',
   },
   {
     title: '데이터 모델링과 쿼리',
-    desc: '목록 하나를 부르는데 쿼리가 수십 번 나가는 문제를 겪은 뒤로, 코드가 만들어내는 SQL을 눈으로 확인하는 습관이 생겼습니다.',
-    tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
+    desc: '목록 하나를 부르는데 쿼리가 여러 번 나가는 문제를 겪은 뒤로, 코드가 만들어내는 SQL을 눈으로 확인하는 습관이 생겼습니다.',
+    tags: ['MySQL · ERD 설계', 'MyBatis', 'N+1 개선'],
     from: 'intelliMarket · Ddasoom에서 경험',
   },
 ]
@@ -128,7 +128,7 @@ const PROJECTS = [
     name: 'Ddasoom (따숨)',
     summary: '유기동물 임시보호 플랫폼 — 팀장 · 회원/보안/공통모듈',
     highlight:
-      '팀장으로서 인증 인프라를 맡아, 토큰 저장 위치부터 강제 로그아웃까지 결정의 선택지와 근거를 문서로 남기며 설계했습니다.',
+      '팀장으로서 인증/인가 인프라를 맡아, 회원가입부터 로그인/로그아웃/강제탈퇴까지 설계했습니다.',
     tags: ['Spring Security', 'JWT 로테이션', 'OAuth2', 'Redis'],
     badge: '팀장',
   },
