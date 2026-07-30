@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Fantry from './pages/Fantry'
 import Ddasoom from './pages/Ddasoom'
 import IntelliMarket from './pages/IntelliMarket'
+import AimPro from './pages/AimPro'
 
 function NotFound() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/fantry" element={<Fantry />} />
         <Route path="/ddasoom" element={<Ddasoom />} />
         <Route path="/intellimarket" element={<IntelliMarket />} />
+        <Route path="/aimpro" element={<AimPro />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

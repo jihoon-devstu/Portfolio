@@ -1,16 +1,26 @@
 import type { ReactNode } from 'react'
 import ProjectHeader from '../components/ProjectHeader'
 import TroubleCard from '../components/TroubleCard'
-import { Bullets, Expand, Figure, Section, SectionNav } from '../components/ui'
+import {
+  Bullets,
+  Expand,
+  Figure,
+  Highlight,
+  Retrospect,
+  RoleSplit,
+  Section,
+  SectionNav,
+  WhyTech,
+} from '../components/ui'
 
 /** Access / Refresh 토큰 전략 비교 표 */
 function TokenTable() {
   const rows: { label: string; at: string; rt: string }[] = [
     { label: '클라이언트 저장', at: '프론트 메모리(Zustand), localStorage 금지', rt: 'HttpOnly 쿠키' },
-    { label: '서버 저장', at: '없음 (stateless)', rt: 'Redis' },
+    { label: '서버 저장', at: '없음 (서버가 기억하지 않음)', rt: 'Redis' },
     { label: '전송 방식', at: 'Authorization: Bearer 헤더', rt: '쿠키 자동 전송' },
-    { label: '유효 기간', at: '30분', rt: '14일 (rotation)' },
-    { label: '무효화 수단', at: 'jti 블랙리스트 + 회원 단위 마커', rt: 'Redis 키 삭제 (로그아웃·탈퇴·제재)' },
+    { label: '유효 기간', at: '30분', rt: '14일 (재발급 시 새 토큰으로 교체)' },
+    { label: '무효화 수단', at: '토큰 고유번호(jti) 블랙리스트 + 회원 단위 마커', rt: 'Redis 키 삭제 (로그아웃·탈퇴·제재)' },
   ]
   return (
     <div className="overflow-x-auto rounded-md border border-slate-200">
@@ -41,7 +51,7 @@ function FilterChainDiagram() {
   const steps = [
     { title: '① 서명·만료 검증', desc: 'parseClaims: 위조/만료 토큰 즉시 차단', cost: 'CPU 연산' },
     { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: 'CPU 연산' },
-    { title: '③ jti 블랙리스트', desc: '로그아웃된 토큰인지 확인', cost: 'Redis 1회' },
+    { title: '③ jti 블랙리스트', desc: '로그아웃된 토큰(고유번호 jti)인지 확인', cost: 'Redis 1회' },
     { title: '④ 강제 로그아웃 마커', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
     { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetails 객체 생성'},
   ]
@@ -204,8 +214,11 @@ export default function Ddasoom() {
 
       <SectionNav
         items={[
+          { id: 'overview', label: '어떤 프로젝트인가' },
+          { id: 'role', label: '나의 자리' },
           { id: 'why', label: '왜 이 파트인가' },
           { id: 'architecture', label: '인증 아키텍처' },
+          { id: 'whytech', label: '기술 선택' },
           { id: 'decisions', label: '결정 로그' },
           { id: 'troubleshooting', label: '트러블슈팅' },
           { id: 'email', label: '이메일 인증' },
@@ -215,18 +228,27 @@ export default function Ddasoom() {
         ]}
       />
 
-      <Section
-        id="why"
-        no="01"
-        title="왜 이 파트인가"
-        subtitle="Spring Security 기반 인증/인가를 직접 구현해 보고 싶었습니다."
-      >
+      <Section id="overview" no="01" title="어떤 프로젝트인가">
         <p className="max-w-3xl leading-relaxed text-slate-700">
-          Spring Security를 설계한 것은 이번이 처음입니다. 이전 프로젝트의 인증 구현을
-          공부하며 가져오려 하자 <br/><b>멀티탭 경합 같은 문제들이 드러났고</b>, 
-          이를 고민하며 고쳐나간 과정을 아래 정리하였습니다.
+          유기동물 정보는 지역과 기관마다 흩어져 있고, 바로 입양을 결심하기에는 부담이 큽니다.
+          따숨은 그 사이에 <b>'임시보호'라는 중간 단계</b>를 두어, 유기동물에게 따뜻한 손길이
+          이어지게 하는 커뮤니티 플랫폼입니다.
         </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 max-w-3xl border-l-2 border-accent-line pl-5 sm:pl-6">
+          <ul className="space-y-2.5 text-base leading-relaxed text-slate-700">
+            <li>
+              <b>찾는다</b> · 전국 유기동물 정보를 한 곳에서 조회
+            </li>
+            <li>
+              <b>함께한다</b> · 임시보호를 신청하고 관리 (신청 → 심사 → 승인 → 연장 → 종료)
+            </li>
+            <li>
+              <b>나눈다</b> · 임보·입양 경험을 커뮤니티에서 공유
+            </li>
+          </ul>
+          <p className="mt-3 text-base text-slate-500">관리자는 대시보드 하나로 전 과정을 관리합니다.</p>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Figure
             src="/images/ddasoom/service-main.png"
             alt="따숨 메인 페이지"
@@ -242,7 +264,53 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="architecture" no="02" title="인증 아키텍처">
+      <Section
+        id="role"
+        no="02"
+        title="팀에서 나의 자리"
+        subtitle="도메인 단위로 나눠 맡았고, 저는 팀장으로서 Security 체계와 공통 모듈 및 컨벤션을 고민하고 설계하였습니다."
+      >
+        <RoleSplit
+          roles={[
+            {
+              role: '회원 · 보안 · 공통모듈',
+              detail:
+                '로그인/회원가입/인증·인가 인프라, 회원 관리(마이페이지·관리자), 팀 공통 규격(응답·예외·페이징)과 컨벤션 문서',
+              mine: true,
+            },
+            { role: '임시보호', detail: '신청 → 승인 → 연장 → 종료 상태 관리' },
+            { role: '커뮤니티 · 이미지', detail: '게시판·댓글, 이미지 저장소, DB 마이그레이션 관리' },
+            { role: '유기동물 데이터', detail: '공공 API 연동·자동 동기화, 좋아요' },
+            { role: '고객지원 · 통계', detail: '공지·FAQ·QnA·신고, 관리자 대시보드·통계' },
+          ]}
+        />
+      </Section>
+
+      <Section
+        id="why"
+        no="03"
+        title="왜 이 파트를 맡았나"
+        subtitle="Spring Security 기반 인증/인가를 직접 구현해 보고 싶었습니다."
+      >
+        <p className="max-w-3xl leading-relaxed text-slate-700">
+          Spring Security를 설계한 것은 이번이 처음입니다. 이전 프로젝트의 인증 구현을
+          공부하며 처음부터 구현하고자 하였으나 <br/> 미처 고려하지 못했던 <b>문제들이</b> 드러났고,
+          이를 고민하며 고쳐나간 과정을 아래에 정리하였습니다.
+        </p>
+      </Section>
+
+      <Section id="focus" no="04" title="가장 파고든 것">
+        <Highlight
+          lines={['JWT와 Spring Security를 제대로 공부해서, 인증을 밑바닥부터 직접 만드는 것']}
+          gains={[
+            '로그인 버튼을 누른 뒤 일어나는 JWT 흐름(토큰 발급 → 검증 → 재발급 → 로그아웃)을 공부할 수 있었던 것',
+            "'여러 탭이 동시에 요청하면?' 같은 예외 상황을 먼저 상상하는 습관",
+            '팀원과의 회의 내용을 선택지·근거와 함께 노션, 코드리뷰 등으로 문서화하는 협업 경험',
+          ]}
+        />
+      </Section>
+
+      <Section id="architecture" no="05" title="인증 아키텍처">
         <TokenTable />
         <div className="mt-6">
           <h3 className="mb-3 font-bold text-ink">요청당 인증 파이프라인</h3>
@@ -286,8 +354,64 @@ export default function Ddasoom() {
       </Section>
 
       <Section
+        id="whytech"
+        no="06"
+        title="왜 이 기술이었나"
+        subtitle="아키텍처에 쓰인 기술들을, 도입한 이유와 써보며 배운 것으로 정리했습니다."
+      >
+        <WhyTech
+          items={[
+            {
+              tech: 'JWT (세션 대신)',
+              why: (
+                <>
+                  수업에서 JWT와 Spring Security를 배웠고, Fantry에서는 팀원이 만든 JWT 인증 위에서
+                  개발하며 그 구조를 겪었습니다. 이번에는 밑바닥부터 제 손으로 설계하고 검증해 보고
+                  싶어 세션 방식 대신 JWT를 택했습니다.
+                </>
+              ),
+              learned: (
+                <>
+                  '발급'보다 '무효화'가 훨씬 어렵다는 것을 배웠습니다. JWT를 다루는 방식(저장 위치, 여러 탭의 Reissue 요청 등)이 이 프로젝트에서의 가장 큰 고민이었습니다.
+                </>
+              ),
+            },
+            {
+              tech: 'Redis',
+              why: (
+                <>
+                  Refresh Token 보관과 인증 코드처럼 '일정 시간이 지나면 사라져야 하는 값'이
+                  많았습니다. 따라서 DB에 저장하기보다, 유효 기간(TTL)을 걸면 알아서 지워지는 Redis가 이 일에 맞다고 판단했습니다.
+                </>
+              ),
+              learned: (
+                <>
+                  만료를 Redis에 맡기니 별도의 정리 작업 없이 시스템이 깔끔해졌고, 토큰 차단
+                  마커처럼 '잠깐만 존재해야 하는 상태'를 다루는 도구로도 쓸 수 있음을 배웠습니다.
+                </>
+              ),
+            },
+            {
+              tech: 'QueryDSL',
+              why: (
+                <>
+                  관리자 회원 검색은 키워드·권한·상태 조건이 조합에 따라 달라집니다. 따라서 동적으로 조건에 따라 자바 코드로 조립할 수 있는 QueryDSL을 택했습니다.
+                </>
+              ),
+              learned: (
+                <>
+                  조건이 없으면 붙이지 않는 방식으로 '미지정 = 전체'를 자연스럽게 처리할 수 있었고,
+                  정렬처럼 SQL 표현이 필요한 부분은 따로 명시하는 방식을 익혔습니다.
+                </>
+              ),
+            },
+          ]}
+        />
+      </Section>
+
+      <Section
         id="decisions"
-        no="03"
+        no="07"
         title="설계 결정 로그"
         subtitle="팀 Notion의 트레이드오프 문서에서 옮긴, 실제 결정 과정의 기록입니다."
       >
@@ -307,13 +431,13 @@ export default function Ddasoom() {
             ]}
             decision={
               <>
-                <b>방식 A 채택.</b>  
-                <br/>B는 AT가 XSS 공격에 취약. 
-                <br/>C는 CSRF 및 CORS 이슈 발생
+                <b>방식 A 채택.</b>
+                <br/>B는 삽입된 스크립트가 저장소를 그대로 읽을 수 있어 AT 탈취에 취약. (XSS)
+                <br/>C는 쿠키가 매 요청 자동 전송되는 특성 때문에 CSRF·CORS 이슈 발생
               </>
             }
             tradeoff={
-              <>A 방식의 경우 , 새로고침 시 토큰이 소실되므로 부트스트랩(로그인 복원)과 401 자동 재발급 인터셉터를 구현 해야 함.</>
+              <>A 방식의 경우, 새로고침 시 토큰이 소실되므로 그에 대한 대비책을 준비하여야 함.</>
             }
             detail={
               <p>
@@ -358,11 +482,11 @@ export default function Ddasoom() {
               <>
                 <b>방식 B 채택 </b> 
                 <br/>구 RT를 별도 키인 Grace Period(TTL 30초)로 보관해 뒤늦은 탭은 새 AT만 발급. 
-                <br/>회전 체인 방지를 위해 <b>재회전은 금지</b>.
+                <br/>무한 루프 방지를 위하여 <b>재회전 금지</b>.
               </>
             }
             tradeoff={
-              <> 구 RT 탈취 시 , Grace Period 의 TTL인 30초 간 재사용 여지. 새 AT 발급만 가능해 피해 범위는 한정됩니다.</>
+              <>재사용 탐지를 넣지 못하므로, RT 탈취 상황에 대한 대비책 고려</>
             }
           />
 
@@ -378,7 +502,7 @@ export default function Ddasoom() {
               { name: 'A. AT 자연 만료까지 대기', note: '30분간 자유롭게 활동 가능' },
               {
                 name: 'B. 매 요청 DB 상태 조회',
-                note: '확실하지만 무상태 설계의 이점을 전부 포기',
+                note: '확실하지만 매 요청마다 DB를 다녀와, JWT를 쓰는 의미가 없어짐',
               },
               {
                 name: (
@@ -405,30 +529,23 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="04" title="트러블슈팅">
+      <Section id="troubleshooting" no="08" title="트러블슈팅">
         <div className="space-y-8">
           <TroubleCard
             no={1}
-            title="로그인 실패 응답: 보안(열거 공격)과 UX(사유 안내)의 상충"
+            title="강제 탈퇴처리한 유저의 로그인 실패 응답: 보안(가입 여부 노출)과 UX(사유 안내)의 상충"
             problem={
               <>
-                사유를 안내하면 <b>이메일 존재가 노출</b>(열거 공격)되고, 숨기면 UX가 나빠집니다.
+                탈퇴 혹은 제재한 유저는 로그인 실패 응답을 어떻게 안내 해야 하는가?
               </>
             }
-            cause={<>보안과 UX가 정면으로 상충하는 트레이드오프.</>}
+            cause={<>비밀번호를 틀렸는데도 실패 사유를 친절히 안내하면 <b>'이 이메일이 가입돼 있다'</b>는 사실 자체가 노출되어 공격의 빌미가 되지만, 숨기면 UX가 나빠집니다.</>}
             solution={
               <>
-                검증 2단 분리. 실패는 <b>단일 코드로 수렴</b>하고, 비밀번호가 일치한 본인에게만
-                탈퇴/제재 사유 안내.
+                검증 2단 분리. 로그인 실패는 <b>아이디 혹은 비밀번호가 맞지 않습니다</b> 를 출력하고, 비밀번호가 일치한 본인에게만 탈퇴/제재 사유 안내.
               </>
             }
             result={<>공격자는 정보를 얻지 못하고, 사용자는 정확한 사유를 안내받습니다.</>}
-            detail={
-              <p>
-                자동 호출 경로인 재발급(reissue)은 사유를 구분하지 않고 단일 응답으로
-                통일했습니다.
-              </p>
-            }
           />
 
           <TroubleCard
@@ -436,7 +553,7 @@ export default function Ddasoom() {
             title="OAuth2 성공 리다이렉트에 AT를 실을 수 없다"
             problem={
               <>
-                리다이렉트에 AT를 실으면 <b>URL(히스토리·서버 로그)에 토큰이 노출</b>됩니다.
+                리다이렉트에 AT를 실으면 <b>토큰이 노출</b>됩니다.
               </>
             }
             cause={<>'AT는 body로만 전달' 원칙(결정 01)과 OAuth2 리다이렉트 흐름의 충돌.</>}
@@ -449,9 +566,9 @@ export default function Ddasoom() {
             detail={
               <>
                 <p>
-                  소셜 신원은 위·변조 가능성이 있는 이메일이 아닌 provider + providerId로 판별하고,
-                  기존 계정과 이메일이 충돌하면 자동 연동 대신 차단을 택해 계정 탈취 가능성을
-                  제거했습니다.
+                  소셜 신원은 위·변조 가능성이 있는 이메일이 아닌, 소셜 서비스가 발급하는 고유
+                  ID(provider + providerId)로 판별하고, 기존 계정과 이메일이 충돌하면 자동 연동
+                  대신 차단을 택해 계정 탈취 가능성을 제거했습니다.
                 </p>
                 <Figure
                   src="/images/ddasoom/login.png"
@@ -465,7 +582,7 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="email" no="05" title="이메일 인증">
+      <Section id="email" no="09" title="이메일 인증">
         <p className="max-w-3xl leading-relaxed text-slate-700">
           인증 메일 발송은 비용이 드는 외부 I/O이므로, 남용을 순서대로 걸러내는 3단 방어를
           두었습니다.
@@ -474,7 +591,7 @@ export default function Ddasoom() {
           {[
             { step: '1차 · IP 제한', desc: '동일 IP 시간당 10회 초과 시 차단. 무차별 발송 봇 방어' },
             { step: '2차 · 쿨다운', desc: '동일 이메일 60초 재발송 제한. 연타 방지' },
-            { step: '3차 · 시도 제한', desc: '검증 5회 초과 시 코드 즉시 폐기. 브루트포스 방어' },
+            { step: '3차 · 시도 제한', desc: '검증 5회 초과 시 코드 즉시 폐기. 무차별 대입 방어' },
           ].map((d, i) => (
             <li key={d.step} className="flex gap-4 leading-relaxed">
               <span className="shrink-0 text-sm font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
@@ -486,7 +603,7 @@ export default function Ddasoom() {
           ))}
         </ol>
         <p className="mt-4 max-w-3xl text-base text-slate-600">
-          인증 코드는 SecureRandom 6자리, Redis TTL 3분. 모든 카운터는 TTL 자연 만료로 정리됩니다.
+          인증 코드는 Random 6자리, Redis에 TTL 3분으로 저장.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
@@ -502,19 +619,20 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="admin" no="06" title="회원 관리">
+      <Section id="admin" no="10" title="회원 관리">
         <Bullets
           items={[
             <>
-              <b>계정 생명주기 설계</b>: soft delete 탈퇴, 동일 이메일 재가입 차단, 관리자 복구
-              허용
+              <b>계정 생명주기 설계</b>: 탈퇴는 데이터를 지우지 않고 상태만 바꾸는 소프트
+              삭제(soft delete) — 동일 이메일 재가입은 차단하되 관리자 복구는 허용
             </>,
             <>
               <b>마이페이지</b>: 정보 수정, 비밀번호 변경(변경 시 <b>전 세션 무효화</b>), 로그인
               이력 조회, 자진 탈퇴
             </>,
             <>
-              <b>QueryDSL 동적 검색</b>: 키워드/권한/상태 필터 조합과 CASE 식 파생 정렬
+              <b>QueryDSL 동적 검색</b>: 키워드/권한/상태 필터를 조건 조합으로 처리. 상태
+              (활성/숨김/탈퇴)처럼 컬럼에 없는 정렬 기준은 쿼리 안에서 CASE로 계산
             </>,
             <>
               <b>제재·강제 탈퇴·복구</b>: 강제 로그아웃 마커(결정 03)와 연동해 즉시 차단, 복구 시
@@ -522,10 +640,6 @@ export default function Ddasoom() {
             </>,
             <>
               <b>관리자 계정 보호</b>: ADMIN은 제재 대상에서 제외, 가입 API로 생성 불가
-            </>,
-            <>
-              <b>조회 2경로 분리</b>: 탈퇴 포함 조회는 관리자 전용으로 분리해 실수를 구조적으로
-              차단
             </>,
           ]}
         />
@@ -550,7 +664,7 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="common" no="07" title="공통 모듈과 협업 방식">
+      <Section id="common" no="11" title="공통 모듈과 협업 방식">
         <Bullets
           items={[
             <>
@@ -560,12 +674,13 @@ export default function Ddasoom() {
               <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 일관된 에러 응답 고려
             </>,
             <>
-              <b>PageableSanitizer</b>: size , sort 등이 비정상적인 요청이 들어올 수 있음을 고려. 
-              화이트리스트 + 상한 클램프 유틸을 만들어 13개 컨트롤러에 일괄 적용
+              <b>PageableSanitizer</b>: size , sort 등이 비정상적인 요청이 들어올 수 있음을 고려.
+              허용된 정렬 기준만 통과시키고 size에 최대값을 두는 유틸을 만들어 13개 컨트롤러에 일괄
+              적용
             </>,
             <>
-              <b>문서 우선 협업</b>: 1. 코드·DB·보안 컨벤션을 문서로 관리하여 프로잭트 안에서 공유.
-              2. 트러블슈팅/트레이드오프/작업요청/라이브러리 도입 가이드 등을 Notion에 축적하여 문서화 된 작업 지향
+              <b>문서 우선 협업</b>: 1. 코드·DB·보안 컨벤션을 문서로 관리하여 프로젝트 안에서 공유.
+              2. 트러블슈팅/트레이드오프/작업요청/라이브러리 도입 가이드 등을 Notion에 축적하여 문서화된 작업 지향
             </>,
           ]}
         />
@@ -574,7 +689,7 @@ export default function Ddasoom() {
         <div className="mt-8">
           <h3 className="mb-3 font-bold text-ink">직접 작성한 설계 문서</h3>
           <p className="mb-4 text-base text-slate-600">
-            백앤드 프로잭트의 docs 폴더 안에 들어있는 컨벤션 및 가이드라인 문서 입니다.
+            백엔드 프로젝트의 docs 폴더 안에 들어 있는 컨벤션 및 가이드라인 문서입니다.
           </p>
           <div className="grid gap-3 lg:grid-cols-3">
             {[
@@ -629,41 +744,36 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="retrospect" no="08" title="성과와 배운 점">
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
-          <div className="border-t-2 border-accent-line pt-4">
-            <h3 className="font-bold text-ink">이 프로젝트가 남긴 것</h3>
-            <div className="mt-3 text-slate-700">
-              <Bullets
-                items={[
-                  <>Spring Security 기반의 인증 / 인가 인프라 직접 구현 경험</>,
-                  <>
-                    AT / RT 의 저장 및 재발급 방식에 따른 각각의 트러블 슈팅과 공격 상황에 대한 고민
-                    과 성장
-                  </>,
-                  <>모든 결정을 선택지·근거와 함께 문서로 남기는 협업 경험</>,
-                ]}
-              />
-            </div>
-          </div>
-          <div className="border-t-2 border-slate-300 pt-4">
-            <h3 className="font-bold text-ink">마치고 나서 이어진 고민</h3>
-            <div className="mt-3 text-slate-700">
-              <Bullets
-                items={[
-                  <>
-                    RT 재사용 탐지는 Grace Period와 상충해 의도적으로 제외하였으나 , 함께 도입할 수
-                    있는 방법에 대한 고민
-                  </>,
-                  <>
-                    Spring Security 도 라이브러리를 도입하여 직접 구현하지 않는 방식에 대한 추가
-                    학습 필요
-                  </>,
-                ]}
-              />
-            </div>
-          </div>
-        </div>
+      <Section id="retrospect" no="12" title="성과와 배운 점">
+        <Retrospect
+          gains={[
+            <>Spring Security 기반의 인증 / 인가 인프라를 <b>밑바닥부터 직접 구현</b>한 경험</>,
+            <>
+              AT / RT의 저장 및 재발급 방식에 따른 각각의 트러블슈팅과 공격 상황에 대한 고민과
+              성장
+            </>,
+            <>
+              '발급'보다 '무효화'가 어렵다는 것 — 서버가 기억하지 않는 토큰을 끊는 장치들을 직접
+              설계한 경험
+            </>,
+            <>모든 결정을 선택지·근거와 함께 문서로 남기는 협업 경험</>,
+          ]}
+          questions={[
+            <>
+              RT 재사용 탐지는 Grace Period와 상충해 의도적으로 제외하였으나, 함께 도입할 수 있는
+              방법에 대한 고민
+            </>,
+            <>
+              Spring Security도 라이브러리를 도입하여 직접 구현하지 않는 방식에 대한 추가 학습
+              필요
+            </>,
+          ]}
+          closing={
+            <>
+              인증 / 인가 체계는 보안과 직결되므로 생각보다 고려해야 하는 사항이 많다는 것을 다시 한 번 체감하였습니다.
+            </>
+          }
+        />
       </Section>
     </>
   )

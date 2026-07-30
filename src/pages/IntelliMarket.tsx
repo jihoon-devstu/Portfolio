@@ -1,6 +1,6 @@
 import ProjectHeader from '../components/ProjectHeader'
 import TroubleCard from '../components/TroubleCard'
-import { Bullets, CodeBlock, Figure, Section } from '../components/ui'
+import { Bullets, CodeBlock, Figure, Highlight, Retrospect, RoleSplit, Section } from '../components/ui'
 
 /** 루트-탑-서브 3단계 카테고리 구조 다이어그램 */
 function CategoryDiagram() {
@@ -113,11 +113,11 @@ export default function IntelliMarket() {
         links={[{ label: 'GitHub', href: 'https://github.com/hye000ne/intellimarket' }]}
       />
 
-      <Section id="why" no="01" title="첫 팀 프로젝트">
+      <Section id="overview" no="01" title="어떤 프로젝트인가">
         <p className="max-w-3xl leading-relaxed text-slate-700">
-          자동 설정이 없는 <b>Spring Legacy(Java Config) + MyBatis + JSP</b> 환경에서, 요청이
-          Controller → Service → DAO → Mapper XML을 거쳐 화면(SSR)으로 렌더링되기까지의 전 과정을
-          직접 구성해 봤습니다. 이 경험이 이후 프로젝트의 기반이 됐습니다.
+          네이버 스마트스토어를 모티브로 한 쇼핑몰 플랫폼입니다. <b>판매자마다 자기 브랜드의
+          스토어를 갖고, 관리자는 마켓 전체를 제어한다</b> — 는 그림을 목표로, 유저 쇼핑몰 / 판매자
+          스토어 / 스토어 어드민 / 마켓 어드민 4개 역할로 나눠 만들었습니다.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
@@ -135,7 +135,47 @@ export default function IntelliMarket() {
         </div>
       </Section>
 
-      <Section id="category" no="02" title="카테고리 구조 설계">
+      <Section
+        id="role"
+        no="02"
+        title="팀에서 나의 자리"
+        subtitle="스토어 팀과 마켓 팀으로 나뉘어 개발한 뒤 병합했습니다."
+      >
+        <RoleSplit
+          roles={[
+            {
+              role: '스토어 어드민 · 데이터 설계',
+              detail:
+                '상품 관리(CRUD)와 주문 관리, 3단계 카테고리 구조 설계, 상품·주문 데이터 흐름 설계와 요구사항 명세',
+              mine: true,
+            },
+            { role: '스토어 페이지', detail: '스토어 메인·상품 목록/상세, 장바구니 담기, 스토어 정보 관리' },
+            { role: '마켓 전반 · 공통', detail: '마켓 메인·회원 기능, 공통 레이아웃, 마켓 어드민' },
+            { role: '결제 · 유저 주문', detail: '단건/다중 결제, 유저 주문 확인과 구매 확정' },
+          ]}
+        />
+      </Section>
+
+      <Section id="why" no="03" title="왜 이 파트를 맡았나">
+        <p className="max-w-3xl leading-relaxed text-slate-700">
+          상품과 주문은 쇼핑몰의 데이터가 모이는 중심입니다.
+          <br/>첫 팀 프로젝트였던 만큼 기능 하나보다 <b>전체 흐름을 이해하는 것</b>을 목표로
+          잡았고, 요청부터 화면까지 전부 따라가 보기에 가장 좋은 자리라고 생각해 맡았습니다.
+        </p>
+      </Section>
+
+      <Section id="focus" no="04" title="가장 파고든 것">
+        <Highlight
+          lines={['Spring과 DB가 어떻게 연결되고, JSP가 어떻게 화면이 되는지 — 웹의 기초를 익히는 것']}
+          gains={[
+            '요청이 Controller → Service → DAO → SQL을 거쳐 화면으로 돌아오는 전 과정을 직접 구성해 본 경험',
+            '화면(JSP)까지 함께 만들며 데이터가 사용자에게 닿는 마지막 순간까지 이해한 것',
+            '3단계 카테고리를 테이블로 설계하며 얻은 데이터 구조 설계의 기본기',
+          ]}
+        />
+      </Section>
+
+      <Section id="category" no="05" title="카테고리 구조 설계">
         <CategoryDiagram />
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
@@ -151,15 +191,15 @@ export default function IntelliMarket() {
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="03" title="트러블슈팅">
+      <Section id="troubleshooting" no="06" title="트러블슈팅">
         <TroubleCard
           no={1}
-          title="카테고리 계층 조회의 N+1: 중첩 select를 JOIN + 중첩 resultMap으로"
+          title="카테고리 조회가 유독 느리다? : 알고 보니 N+1"
           problem={
             <>
-              판매자 카테고리 트리를 조회할 때 응답이 다른 조회에 비해 느린 점을 확인하였습니다. 로그를 확인하니{' '}
-              <b>서브 카테고리 1건을 읽을 때마다 상위 카테고리 조회 쿼리가 연쇄적으로 추가 실행</b>
-              되고 있었습니다.
+              판매자 카테고리 트리 조회가 다른 조회에 비해 유독 느림.
+              <br/>로그를 확인하니 <b>서브 카테고리 1건을 읽을 때마다 상위 카테고리 조회 쿼리가
+              연쇄적으로 추가 실행</b>되고 있었음.
             </>
           }
           cause={
@@ -168,16 +208,15 @@ export default function IntelliMarket() {
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">
                 &lt;association select="..."&gt;
               </code>{' '}
-              방식이 매핑 시점에 지연 쿼리를 다시 날린다는 것을 이때 처음 알았습니다. sub → top →
-              root로 연쇄되어 <b>서브 카테고리 N건 조회 시 1 + 2N개의 쿼리</b>가 실행되는 N+1
-              구조였습니다.
+              방식은 매핑할 때마다 쿼리를 다시 날림. sub → top → root로 연쇄되어{' '}
+              <b>서브 카테고리 N건 조회 시 1 + 2N개의 쿼리</b>가 실행되는 N+1 구조였음.
             </>
           }
           solution={
             <>
               카테고리 트리 조회를 <b>4개 테이블 JOIN 단일 쿼리</b>로 재작성하고, 중첩{' '}
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">&lt;association&gt;</code>{' '}
-              resultMap으로 root → top → sub 계층 객체를 쿼리 결과에서 조립하도록 개선했습니다.
+              resultMap으로 root → top → sub 계층 객체를 쿼리 결과에서 조립하도록 개선.
             </>
           }
           result={
@@ -211,7 +250,7 @@ ORDER BY root.category_name, top.category_name, sub.category_name
         />
       </Section>
 
-      <Section id="order" no="04" title="상품 · 주문 관리">
+      <Section id="order" no="07" title="상품 · 주문 관리">
         <Bullets
           items={[
             <>
@@ -224,8 +263,8 @@ ORDER BY root.category_name, top.category_name, sub.category_name
               관리
             </>,
             <>
-              <b>어드민 카테고리 그룹화</b>: JOIN으로 정렬된 데이터를 가져와 서비스
-              계층에서 Stream과 LinkedHashMap으로 '상위 → 하위 목록' 구조로 조립. 
+              <b>어드민 카테고리 그룹화</b>: JOIN으로 정렬해 가져온 데이터를 서비스 계층에서
+              '상위 → 하위 목록' 구조로 묶어 화면에 전달
             </>,
           ]}
         />
@@ -237,12 +276,31 @@ ORDER BY root.category_name, top.category_name, sub.category_name
         />
       </Section>
 
-      <Section id="retrospect" no="05" title="회고">
-        <p className="max-w-3xl leading-relaxed text-slate-700">
-          완성하고 돌아보니 트랜잭션 경계, 재고 차감, 입력 검증 등 당시에는 보이지 않던 한계가 많았습니다. <br/>
-          <b>'클라이언트는 신뢰할 수 없다. 따라서 API는 그 어떤 상황에도 대비하여야된다.'</b>
-          <br/>라는 점을 다시 한번 마음에 새기게 되었습니다. 
-        </p>
+      <Section id="retrospect" no="08" title="성과와 배운 점">
+        <Retrospect
+          gains={[
+            <>
+              요청이 Controller → Service → DAO → SQL을 거쳐 <b>화면이 되기까지의 전 과정</b>을
+              직접 구성해 본 경험
+            </>,
+            <>3단계 카테고리를 테이블로 설계하며 얻은 <b>데이터 구조 설계의 기본기</b></>,
+            <>
+              N+1 문제를 겪은 뒤로, <b>코드가 만들어내는 SQL을 눈으로 확인하는 습관</b>이 생긴 것
+            </>,
+          ]}
+          questions={[
+            <>
+              완성하고 돌아보니 트랜잭션 경계, 재고 차감, 입력 검증 등 당시에는 보이지 않던 한계가
+              많았습니다. 이 한계들이 다음 프로젝트의 공부 방향이 됐습니다.
+            </>,
+          ]}
+          closing={
+            <>
+              "클라이언트는 신뢰할 수 없다. 따라서 API는 그 어떤 상황에도 대비하여야 한다." — 이때
+              새긴 원칙이 다음 프로젝트들의 출발점이 됐습니다.
+            </>
+          }
+        />
       </Section>
     </>
   )

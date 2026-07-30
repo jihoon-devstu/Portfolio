@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONTACT } from '../components/Layout'
-import { Expand, Figure, Tag } from '../components/ui'
+import { Tag } from '../components/ui'
 
 /** 가치관 — 이전 포트폴리오에서 직접 쓴 문장을 기반으로 정리 */
 const VALUES = [
@@ -86,7 +86,7 @@ const CORE_SKILLS = [
   {
     title: '데이터 모델링과 쿼리',
     desc: '목록 하나를 부르는데 쿼리가 여러 번 나가는 문제를 겪은 뒤로, 코드가 만들어내는 SQL을 눈으로 확인하는 습관이 생겼습니다.',
-    tags: ['MySQL · ERD 설계', 'MyBatis', 'N+1 개선'],
+    tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
     from: 'intelliMarket · Ddasoom에서 경험',
   },
 ]
@@ -118,7 +118,7 @@ const PROJECTS = [
     name: 'Fantry',
     summary: '실시간 중고 경매 플랫폼 — 실시간 경매 시스템 담당',
     highlight:
-      'DB 트랜잭션 기반 구현에서 출발해 Redis Lua Script 동시성 제어, DB Fallback, Batch Insert까지 단계적으로 고도화했습니다.',
+      'DB 트랜잭션 기반 구현에서 출발해 Redis 기반 동시성 제어(Lua Script), DB Fallback, Batch Insert까지 단계적으로 고도화했습니다.',
     tags: ['WebSocket·STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
     badge: '대표 프로젝트',
   },
@@ -141,6 +141,16 @@ const PROJECTS = [
       'Spring Legacy와 JSP 환경에서 3단계 카테고리 구조를 설계하고 N+1 문제를 개선한 첫 팀 프로젝트입니다.',
     tags: ['Spring Legacy', 'MyBatis', 'N+1 개선', 'JSP SSR'],
     badge: null,
+  },
+  {
+    to: '/aimpro',
+    period: '2025.05',
+    name: 'Aim Pro',
+    summary: '반응속도 타겟 클릭 게임 — 개발 1개월차 첫 개인 프로젝트',
+    highlight:
+      '라이브러리 없이 순수 HTML·CSS·JS만으로, 배운 것만 가지고 처음부터 끝까지 완성해 본 첫 결과물입니다.',
+    tags: ['HTML · CSS · JS', '클래스 설계', '상태 관리'],
+    badge: '첫 개인 프로젝트',
   },
 ]
 
@@ -337,61 +347,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bonus — Aim Pro */}
-      <section className="border-t border-slate-200 py-14">
-        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">04</p>
-        <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h2 className="text-2xl font-bold text-ink">Bonus · 개발의 시작점</h2>
-          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-500">
-            개발 1개월차 개인 프로젝트
-          </span>
-        </div>
-        <div className="mt-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-xl font-bold text-ink">Aim Pro</h3>
-            <span className="text-sm text-slate-400">2025.05 · 개인 프로젝트</span>
-          </div>
-          <p className="mt-2 max-w-3xl leading-relaxed text-slate-600">
-            개발 1개월차에, 배운 것만으로 무엇을 만들 수 있는지 확인하고 싶어 만든 에임 트레이닝
-            게임입니다. 라이브러리 없이 순수 HTML · CSS · JavaScript로 상태 관리와 객체 설계, DOM
-            제어를 전부 직접 구현했습니다.
-          </p>
-          <div className="mt-5 max-w-3xl">
-            <Expand summary="구현 노트 — 무엇을 어떻게 만들었나">
-              <ul className="space-y-2">
-                <li>
-                  · <b>ES6 Class로 Target 객체 설계</b>: 생성, 클릭 검증, 소멸을 객체 단위로
-                  캡슐화
-                </li>
-                <li>
-                  · <b>상태 플래그 기반 게임 상태 전이</b>: 시작/일시정지/재개/초기화/종료를 상태
-                  변수 조합으로 제어 (이후 배우게 될 '상태 머신' 개념을 스스로 고민한 흔적)
-                </li>
-                <li>
-                  · <b>타겟 역순 생성으로 겹침 문제 해결</b>: 낮은 번호가 항상 위에 오도록 역순으로
-                  DOM에 추가해 클릭 불가 상황을 차단
-                </li>
-                <li>
-                  · <b>10ms 단위 스톱워치와 기록 보드</b>: 난이도 8단계, 회차별 기록 누적까지 게임
-                  한 사이클 완성
-                </li>
-              </ul>
-            </Expand>
-          </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <Figure
-              src="/images/aimpro/gameplay.png"
-              alt="Aim Pro 게임 플레이 화면"
-              caption="게임 플레이 · 숫자 순서대로 타겟 클릭, 스톱워치 기록"
-            />
-            <Figure
-              src="/images/aimpro/records.png"
-              alt="Aim Pro 기록 보드"
-              caption="회차별 기록 보드 · 난이도와 클리어 타임 누적"
-            />
-          </div>
-        </div>
-      </section>
     </>
   )
 }
