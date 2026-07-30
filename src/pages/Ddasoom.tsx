@@ -43,7 +43,7 @@ function FilterChainDiagram() {
     { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: 'CPU 연산' },
     { title: '③ jti 블랙리스트', desc: '로그아웃된 토큰인지 확인', cost: 'Redis 1회' },
     { title: '④ 강제 로그아웃 마커', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
-    { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetail 생성'},
+    { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetails 객체 생성'},
   ]
   return (
     <div className="rounded-md border border-slate-200 bg-slate-50/50 p-5 sm:p-6">
@@ -224,7 +224,7 @@ export default function Ddasoom() {
         <p className="max-w-3xl leading-relaxed text-slate-700">
           Spring Security를 설계한 것은 이번이 처음입니다. 이전 프로젝트의 인증 구현을
           공부하며 가져오려 하자 <br/><b>멀티탭 경합 같은 문제들이 드러났고</b>, 
-          이를 고민하며 고쳐나간 과정이 아래 정리하였습니다.
+          이를 고민하며 고쳐나간 과정을 아래 정리하였습니다.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
