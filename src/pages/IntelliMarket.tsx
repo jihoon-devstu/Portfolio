@@ -296,8 +296,7 @@ ORDER BY root.category_name, top.category_name, sub.category_name
           ]}
           closing={
             <>
-              "클라이언트는 신뢰할 수 없다. 따라서 API는 그 어떤 상황에도 대비하여야 한다." — 이때
-              새긴 원칙이 다음 프로젝트들의 출발점이 됐습니다.
+              RDBMS 를 다룰때엔 쓰기,삭제도 중요하지만 연관 관계에 따른 성능 좋은 조회가 더욱 중요하다는 점을 배웠습니다.
             </>
           }
         />

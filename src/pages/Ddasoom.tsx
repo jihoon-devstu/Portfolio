@@ -301,7 +301,7 @@ export default function Ddasoom() {
 
       <Section id="focus" no="04" title="가장 파고든 것">
         <Highlight
-          lines={['JWT와 Spring Security를 제대로 공부해서, 인증을 밑바닥부터 직접 만드는 것']}
+          lines={['JWT와 Spring Security의 구조 및 구현 방식에 대한 공부']}
           gains={[
             '로그인 버튼을 누른 뒤 일어나는 JWT 흐름(토큰 발급 → 검증 → 재발급 → 로그아웃)을 공부할 수 있었던 것',
             "'여러 탭이 동시에 요청하면?' 같은 예외 상황을 먼저 상상하는 습관",
@@ -339,7 +339,7 @@ export default function Ddasoom() {
                 은 ADMIN 자동 잠금. 경로 규칙만 지키면 인가 시스템 활용 가능
               </li>
               <li>
-                · 소셜 가입 직후는 GUEST 권한 부여. 추가 정보 입력 API만 허용하고, 완료 후 USER 권한으로 승급
+                · 소셜 가입 직후는 GUEST 권한 부여. 추가 정보 입력 API 및 PUBLIC_URI만 허용하고, 완료 후 USER 권한으로 승급
               </li>
               <li>
                 · 미분류 경로는{' '}
@@ -365,14 +365,12 @@ export default function Ddasoom() {
               tech: 'JWT (세션 대신)',
               why: (
                 <>
-                  수업에서 JWT와 Spring Security를 배웠고, Fantry에서는 팀원이 만든 JWT 인증 위에서
-                  개발하며 그 구조를 겪었습니다. 이번에는 밑바닥부터 제 손으로 설계하고 검증해 보고
-                  싶어 세션 방식 대신 JWT를 택했습니다.
+                  Fantry에서는 팀원이 만든 JWT 인증 위에서 개발하며 그 구조를 겪었습니다. 이번에는 Spring Security 와 JWT를 직접 설계하고 검증해보고 싶어 선택했습니다.
                 </>
               ),
               learned: (
                 <>
-                  '발급'보다 '무효화'가 훨씬 어렵다는 것을 배웠습니다. JWT를 다루는 방식(저장 위치, 여러 탭의 Reissue 요청 등)이 이 프로젝트에서의 가장 큰 고민이었습니다.
+                  '발급'도 중요하지만 '무효화'가 더욱 중요하다는 것을 배웠습니다. JWT를 다루는 방식(저장 위치, 여러 탭의 Reissue 요청 등)이 이 프로젝트에서의 가장 많이 고민한 부분입니다.
                 </>
               ),
             },
@@ -386,8 +384,7 @@ export default function Ddasoom() {
               ),
               learned: (
                 <>
-                  만료를 Redis에 맡기니 별도의 정리 작업 없이 시스템이 깔끔해졌고, 토큰 차단
-                  마커처럼 '잠깐만 존재해야 하는 상태'를 다루는 도구로도 쓸 수 있음을 배웠습니다.
+                  만료를 Redis에 맡기니 별도의 정리 작업 없어 깔끔했고, '시간이 지나면 사라져야 하는 값'을 다루는 도구로도 쓸 수 있음을 배웠습니다.
                 </>
               ),
             },
@@ -432,7 +429,7 @@ export default function Ddasoom() {
             decision={
               <>
                 <b>방식 A 채택.</b>
-                <br/>B는 삽입된 스크립트가 저장소를 그대로 읽을 수 있어 AT 탈취에 취약. (XSS)
+                <br/>B는 악의적으로 삽입된 스크립트가 저장소를 그대로 읽을 수 있어 AT 탈취에 취약. (XSS)
                 <br/>C는 쿠키가 매 요청 자동 전송되는 특성 때문에 CSRF·CORS 이슈 발생
               </>
             }
@@ -444,8 +441,6 @@ export default function Ddasoom() {
                 한 탭 안에서 여러 API가 동시에 401을 받는 경우를 위해 프론트에는 Single-flight
                 패턴(진행 중인 재발급 Promise를 공유)을 적용. 
                 <br/>reissue 요청은 인터셉터가 없는 별도 axios 인스턴스로 분리하여 재발급 무한 루프 가능성 차단.
-                <br/>탭과 탭 사이의 경합은 서버의 Grace Period(30초)가, 한 탭 안에서의 경합은 프론트의 Single-flight가
-                흡수하는 이중 구조 설계로 결정
               </p>
             }
           />
@@ -470,7 +465,7 @@ export default function Ddasoom() {
                     B. 로테이션 + <b>Grace Period</b>
                   </>
                 ),
-                note: '회전 직후의 구 RT를 잠시 Redis에 같이 보관하여 동시 요청을 흡수',
+                note: '회전 직후의 구 RT를 잠시 Redis에 같이 보관하여 요청 처리',
                 chosen: true,
               },
               {
@@ -687,7 +682,7 @@ export default function Ddasoom() {
 
         {/* 직접 작성한 설계 문서 3종 */}
         <div className="mt-8">
-          <h3 className="mb-3 font-bold text-ink">직접 작성한 설계 문서</h3>
+          <h3 className="mb-3 font-bold text-ink">컨벤션 설계 문서</h3>
           <p className="mb-4 text-base text-slate-600">
             백엔드 프로젝트의 docs 폴더 안에 들어 있는 컨벤션 및 가이드라인 문서입니다.
           </p>
@@ -747,22 +742,17 @@ export default function Ddasoom() {
       <Section id="retrospect" no="12" title="성과와 배운 점">
         <Retrospect
           gains={[
-            <>Spring Security 기반의 인증 / 인가 인프라를 <b>밑바닥부터 직접 구현</b>한 경험</>,
+            <>Spring Security 기반의 인증 / 인가 인프라를 <b>직접 구현</b>한 경험</>,
             <>
               AT / RT의 저장 및 재발급 방식에 따른 각각의 트러블슈팅과 공격 상황에 대한 고민과
               성장
             </>,
             <>
-              '발급'보다 '무효화'가 어렵다는 것 — 서버가 기억하지 않는 토큰을 끊는 장치들을 직접
-              설계한 경험
+              '발급'보다 '무효화'가 어렵다는 것 — 서버가 저장하지 않는 토큰의 무효화 처리에 대한 고민
             </>,
             <>모든 결정을 선택지·근거와 함께 문서로 남기는 협업 경험</>,
           ]}
           questions={[
-            <>
-              RT 재사용 탐지는 Grace Period와 상충해 의도적으로 제외하였으나, 함께 도입할 수 있는
-              방법에 대한 고민
-            </>,
             <>
               Spring Security도 라이브러리를 도입하여 직접 구현하지 않는 방식에 대한 추가 학습
               필요
@@ -770,7 +760,7 @@ export default function Ddasoom() {
           ]}
           closing={
             <>
-              인증 / 인가 체계는 보안과 직결되므로 생각보다 고려해야 하는 사항이 많다는 것을 다시 한 번 체감하였습니다.
+              트러블 슈팅 상황과 트레이드 오프 상황, 개발 근거들을 문서화 하는 습관이 정말 중요하다는 것을 느꼈습니다.
             </>
           }
         />
