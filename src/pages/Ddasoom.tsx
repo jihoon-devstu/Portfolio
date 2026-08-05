@@ -51,8 +51,8 @@ function FilterChainDiagram() {
   const steps = [
     { title: '① 서명·만료 검증', desc: 'parseClaims: 위조/만료 토큰 즉시 차단', cost: 'CPU 연산' },
     { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: 'CPU 연산' },
-    { title: '③ jti 블랙리스트', desc: '로그아웃된 토큰(고유번호 jti)인지 확인', cost: 'Redis 1회' },
-    { title: '④ 강제 로그아웃 마커', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
+    { title: '③ jti 블랙리스트등록 여부 확인', desc: '로그아웃된 토큰(고유번호 jti)인지 확인', cost: 'Redis 1회' },
+    { title: '④ 강제 로그아웃 마커 등록 여부 확인', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
     { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetails 객체 생성'},
   ]
   return (
@@ -331,10 +331,6 @@ export default function Ddasoom() {
                 에 나누어 작성.
               </li>
               <li>
-                · <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">/api/auth/**</code>{' '}
-                와일드카드를 의도적으로 금지하고 엔드포인트를 개별 등록. 
-              </li>
-              <li>
                 · <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">/api/admin/**</code>{' '}
                 은 ADMIN 자동 잠금. 경로 규칙만 지키면 인가 시스템 활용 가능
               </li>
@@ -526,25 +522,9 @@ export default function Ddasoom() {
 
       <Section id="troubleshooting" no="08" title="트러블슈팅">
         <div className="space-y-8">
-          <TroubleCard
-            no={1}
-            title="강제 탈퇴처리한 유저의 로그인 실패 응답: 보안(가입 여부 노출)과 UX(사유 안내)의 상충"
-            problem={
-              <>
-                탈퇴 혹은 제재한 유저는 로그인 실패 응답을 어떻게 안내 해야 하는가?
-              </>
-            }
-            cause={<>비밀번호를 틀렸는데도 실패 사유를 친절히 안내하면 <b>'이 이메일이 가입돼 있다'</b>는 사실 자체가 노출되어 공격의 빌미가 되지만, 숨기면 UX가 나빠집니다.</>}
-            solution={
-              <>
-                검증 2단 분리. 로그인 실패는 <b>아이디 혹은 비밀번호가 맞지 않습니다</b> 를 출력하고, 비밀번호가 일치한 본인에게만 탈퇴/제재 사유 안내.
-              </>
-            }
-            result={<>공격자는 정보를 얻지 못하고, 사용자는 정확한 사유를 안내받습니다.</>}
-          />
 
           <TroubleCard
-            no={2}
+            no={1}
             title="OAuth2 성공 리다이렉트에 AT를 실을 수 없다"
             problem={
               <>
@@ -622,7 +602,7 @@ export default function Ddasoom() {
               삭제(soft delete) — 동일 이메일 재가입은 차단하되 관리자 복구는 허용
             </>,
             <>
-              <b>마이페이지</b>: 정보 수정, 비밀번호 변경(변경 시 <b>전 세션 무효화</b>), 로그인
+              <b>마이페이지</b>: 정보 수정, 비밀번호 변경(변경 시 <b> 재 로그인 요청</b>), 로그인
               이력 조회, 자진 탈퇴
             </>,
             <>
@@ -630,7 +610,7 @@ export default function Ddasoom() {
               (활성/숨김/탈퇴)처럼 컬럼에 없는 정렬 기준은 쿼리 안에서 CASE로 계산
             </>,
             <>
-              <b>제재·강제 탈퇴·복구</b>: 강제 로그아웃 마커(결정 03)와 연동해 즉시 차단, 복구 시
+              <b>제재·강제 탈퇴·복구</b>: 강제 탈퇴 마커(결정 03)와 연동해 즉시 차단, 복구 시
               해제
             </>,
             <>

@@ -179,7 +179,7 @@ export default function Fantry() {
             '자동화된 경매 낙찰·주문 생성 시스템을 만드는 것',
           ]}
           gains={[
-            '실시간 통신(WebSocket · STOMP)을 연결부터 인증까지 직접 다뤄본 점',
+            '실시간 통신(WebSocket · STOMP) 연결을 직접 다뤄본 점',
             'Race Condition이 왜 위험하고, 동시성 제어는 어떻게 하는지 고민해 보게 된 점',
             '여러 요청을 한 번에 처리하는 Batch Insert 설계 및 구현 경험',
             'Spring Scheduler를 활용한 자동화 시스템 설계 및 구현 경험',
@@ -232,7 +232,7 @@ export default function Fantry() {
               learned: (
                 <>
                   연결 수립이 일반 HTTP 요청과 다르다는 것을 배포 환경 장애로 배웠고(트러블슈팅
-                  01), 로그인한 사람만 입찰할 수 있도록 하는 인증 연동 (JWT 활용)까지 다뤘습니다.
+                  01), 여러 환경에서 각각 테스트를 진행해야하는 이유를 알게되었습니다.
                 </>
               ),
             },
@@ -271,7 +271,6 @@ export default function Fantry() {
             <li>1. 입찰 시도마다 DB에 접근(최고가 조회/검증/갱신)하면 무리가 가지 않는가?</li>
             <li>2. 그렇다면 성능 최적화를 위해 Redis를 연동할 수는 없겠는가?</li>
             <li>3. 동시성(Race Condition) 문제는 어떻게 해결할 것인가?</li>
-            <li>4. 입찰은 로그인 유저만 가능해야 하는데, WebSocket 연결 시 인증/인가는 어떻게 연동하는가?</li>
           </ul>
         </div>
 
@@ -429,9 +428,6 @@ checks_failed......: 0.00%    0 out of 2079
         <Bullets
           items={[
             <>
-              <b>JWT 기반 WebSocket 인증/인가</b>: WebSocket 연결 시 단 한순간 있는 HTTP 요청(핸드셰이크) 시점에 JWT 유무를 판단 및 전달하도록 구현
-            </>,
-            <>
               <b>@Scheduled 기반 경매 라이프사이클</b>: 경매 자동 활성화/마감과 낙찰 확정, 주문
               자동 생성 및 2초 주기 입찰 기록 일괄 저장(Batch Insert) 구현
             </>,
@@ -451,7 +447,7 @@ checks_failed......: 0.00%    0 out of 2079
               직접 다뤄봤습니다.
             </>,
             <>
-              실시간 통신(WebSocket)을 <b>연결 수립부터 인증까지</b> 직접 다뤄본 경험을
+              실시간 통신(WebSocket)을 <b>연결 수립</b> 을 직접 다뤄본 경험을
               얻었습니다.
             </>,
             <>
