@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONTACT } from '../components/Layout'
-import { Tag } from '../components/ui'
+import { Bullets, Tag } from '../components/ui'
 
 /** 가치관 — 이전 포트폴리오에서 직접 쓴 문장을 기반으로 정리 */
 const VALUES = [
@@ -70,22 +70,34 @@ const CERTIFICATES = [
 ]
 
 /** 핵심 역량 — 프로젝트에서 실제로 부딪히며 배운 것 중심 */
-const CORE_SKILLS = [
+const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string }[] = [
   {
     title: '동시성 제어와 성능',
-    desc: '실시간 경매 시스템 구현에서 동시성 제어가 필요하다는 것을 실감하였습니다. 데이터의 정합성이 깨지지 않도록 안전하지만 성능 좋게 처리하는 방법을 공부해 적용했습니다.',
+    desc: [
+      '입찰 조회·검증·갱신을 Redis Lua Script 단일 원자 연산으로 처리',
+      'Redis 장애 시 DB 비관적 락으로 전환, 복구 감지 후 동기화',
+      '입찰 기록은 In-memory Queue → 2초 주기 Batch Insert',
+    ],
     tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'Batch Insert'],
     from: 'Fantry에서 경험',
   },
   {
     title: '인증과 보안 설계',
-    desc: '로그인이 되게 만드는 것에서 멈추지 않고 토큰의 저장 위치 , 인증/인가 체계를 고민하며 개발하였습니다.',
+    desc: [
+      'AT는 프론트 메모리, RT는 HttpOnly 쿠키 + Redis (localStorage 배제)',
+      'RT 로테이션 + Grace Period 30초로 멀티탭 재발급 경합 해소',
+      'jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 즉시 차단',
+    ],
     tags: ['Spring Security', 'JWT · OAuth2', 'Redis TTL 설계'],
     from: 'Ddasoom에서 경험',
   },
   {
     title: '데이터 모델링과 쿼리',
-    desc: '목록 하나를 부르는데 쿼리가 여러 번 나가는 문제를 겪은 뒤로, 코드가 만들어내는 SQL을 눈으로 확인하는 습관이 생겼습니다.',
+    desc: [
+      '3단계 카테고리 + 스토어 N:M 매핑 테이블 설계',
+      'MyBatis association N+1 개선 — 4테이블 JOIN + 중첩 resultMap, 쿼리 1+2N → 1',
+      'QueryDSL 동적 조건 조합으로 관리자 검색 구현',
+    ],
     tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
     from: 'intelliMarket · Ddasoom에서 경험',
   },
@@ -118,7 +130,7 @@ const PROJECTS = [
     name: 'Fantry',
     summary: '실시간 중고 경매 플랫폼 — 실시간 경매 시스템 담당',
     highlight:
-      'DB 트랜잭션 기반 구현에서 출발해 Redis 기반 동시성 제어(Lua Script), DB Fallback, Batch Insert까지 단계적으로 고도화했습니다.',
+      'DB 트랜잭션 → Redis Lua Script 동시성 제어 → DB Fallback → Batch Insert 단계적 고도화',
     tags: ['WebSocket·STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
     badge: '대표 프로젝트',
   },
@@ -128,7 +140,7 @@ const PROJECTS = [
     name: 'Ddasoom (따숨)',
     summary: '유기동물 임시보호 플랫폼 — 팀장 · 회원/보안/공통모듈',
     highlight:
-      '팀장으로서 인증/인가 인프라를 맡아, 회원가입부터 로그인/로그아웃/강제탈퇴까지 설계했습니다.',
+      'Spring Security 인증/인가 인프라 설계 — 토큰 저장 위치, RT 로테이션, 강제 로그아웃 마커 결정 로그 3건',
     tags: ['Spring Security', 'JWT 로테이션', 'OAuth2', 'Redis'],
     badge: '팀장',
   },
@@ -138,7 +150,7 @@ const PROJECTS = [
     name: 'intelliMarket',
     summary: 'JSP 기반 SSR 쇼핑몰 — 스토어 상품/주문 관리',
     highlight:
-      'Spring Legacy와 JSP 환경에서 3단계 카테고리 구조를 설계하고 N+1 문제를 개선한 첫 팀 프로젝트입니다.',
+      'Spring Legacy · JSP 환경에서 3단계 카테고리 설계, MyBatis N+1 개선 (쿼리 1+2N → 1)',
     tags: ['Spring Legacy', 'MyBatis', 'N+1 개선', 'JSP SSR'],
     badge: null,
   },
@@ -148,7 +160,7 @@ const PROJECTS = [
     name: 'Aim Pro',
     summary: '반응속도 타겟 클릭 게임 — 개발 1개월차 첫 개인 프로젝트',
     highlight:
-      '라이브러리 없이 순수 HTML·CSS·JS만으로, 배운 것만 가지고 처음부터 끝까지 완성해 본 첫 결과물입니다.',
+      '라이브러리 없이 HTML·CSS·JS만으로 완성 — 클래스 기반 타겟 설계, 게임 상태 관리',
     tags: ['HTML · CSS · JS', '클래스 설계', '상태 관리'],
     badge: '첫 개인 프로젝트',
   },
@@ -271,7 +283,9 @@ export default function Home() {
           {CORE_SKILLS.map((s) => (
             <div key={s.title} className="flex flex-col border-t-2 border-accent-line pt-4">
               <h3 className="text-lg font-bold text-ink">{s.title}</h3>
-              <p className="mt-2 flex-1 text-base leading-relaxed text-slate-600">{s.desc}</p>
+              <div className="mt-3 flex-1 text-base text-slate-600">
+                <Bullets items={s.desc} />
+              </div>
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {s.tags.map((t) => (
                   <Tag key={t} accent>

@@ -212,24 +212,34 @@ export function RoleSplit({
   )
 }
 
-/** '왜 이 기술이었나' — 배운 계기와 도입 이유, 그리고 써보니 알게 된 것 */
+/** '왜 이 기술이었나' — 도입 이유와 감수한 것을 한 행으로 훑는 표 */
 export function WhyTech({
   items,
 }: {
   items: { tech: string; why: ReactNode; learned: ReactNode }[]
 }) {
   return (
-    <div className="grid gap-8 lg:grid-cols-3 lg:gap-6">
-      {items.map((t) => (
-        <div key={t.tech} className="flex flex-col border-t-2 border-accent-line pt-4">
-          <h3 className="font-bold text-ink">{t.tech}</h3>
-          <p className="mt-2 flex-1 text-base leading-relaxed text-slate-600">{t.why}</p>
-          <div className="mt-4 rounded-md bg-slate-50 px-4 py-3 text-base leading-relaxed text-slate-600">
-            <span className="font-bold text-accent-deep">써보니 → </span>
-            {t.learned}
-          </div>
-        </div>
-      ))}
+    <div className="overflow-x-auto rounded-md border border-slate-200">
+      <table className="w-full min-w-[720px] text-left text-base">
+        <thead>
+          <tr className="border-b border-slate-200 bg-slate-50 text-sm text-slate-500">
+            <th className="w-44 px-4 py-3 font-semibold text-ink">기술</th>
+            <th className="w-2/5 px-4 py-3 font-semibold">도입 이유</th>
+            <th className="px-4 py-3 font-semibold">감수한 것 · 알게 된 것</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {items.map((t) => (
+            <tr key={t.tech}>
+              <td className="px-4 py-3.5 align-top font-bold leading-relaxed text-accent-deep">
+                {t.tech}
+              </td>
+              <td className="px-4 py-3.5 align-top leading-relaxed text-slate-700">{t.why}</td>
+              <td className="px-4 py-3.5 align-top leading-relaxed text-slate-600">{t.learned}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -242,7 +252,7 @@ export function Retrospect({
 }: {
   gains: ReactNode[]
   questions: ReactNode[]
-  closing: ReactNode
+  closing?: ReactNode
 }) {
   return (
     <div className="rounded-md border-2 border-accent-line bg-accent-soft/50 px-6 py-8 sm:px-10 sm:py-10">
@@ -270,9 +280,11 @@ export function Retrospect({
           </ul>
         </div>
       </div>
-      <p className="mt-8 border-t border-accent-line pt-6 text-lg font-bold leading-relaxed text-ink sm:text-xl">
-        {closing}
-      </p>
+      {closing && (
+        <p className="mt-8 border-t border-accent-line pt-6 text-lg font-bold leading-relaxed text-ink sm:text-xl">
+          {closing}
+        </p>
+      )}
     </div>
   )
 }

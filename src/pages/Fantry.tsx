@@ -110,23 +110,30 @@ export default function Fantry() {
           { id: 'overview', label: '어떤 프로젝트인가' },
           { id: 'role', label: '나의 자리' },
           { id: 'why', label: '왜 이 파트인가' },
+          { id: 'focus', label: '가장 파고든 것' },
           { id: 'architecture', label: '입찰 아키텍처' },
           { id: 'whytech', label: '기술 선택' },
           { id: 'troubleshooting', label: '트러블슈팅' },
+          { id: 'etc', label: '그 외 구현' },
           { id: 'retrospect', label: '성과와 배운 점' },
         ]}
       />
 
       <Section id="overview" no="01" title="어떤 프로젝트인가">
-        <p className="max-w-3xl leading-relaxed text-slate-700">
-          중고 거래에는 딜레마가 있습니다. 일반 중고 시장은 저렴하고 다양하지만{' '}
-          <b>가품·사기의 불안</b>이 따르고, 전문 검수 시장은 믿을 수 있지만 스니커즈·명품 등{' '}
-          <b>일부 분야에 한정</b>됩니다.
-        </p>
-        <p className="mt-4 max-w-3xl leading-relaxed text-slate-700">
-          Fantry는 그 사이를 노렸습니다. 판매자가 상품을 위탁하면 <b>플랫폼이 검수해서 경매에
-          올리고</b>, 낙찰부터 배송·정산까지 책임지는 아이돌 굿즈 경매 플랫폼입니다.
-        </p>
+        <div className="max-w-3xl border-l-2 border-accent-line pl-5 sm:pl-6">
+          <ul className="space-y-2.5 text-base leading-relaxed text-slate-700">
+            <li>
+              <b>일반 중고 시장</b> · 저렴하고 다양함, 가품·사기 리스크
+            </li>
+            <li>
+              <b>전문 검수 시장</b> · 신뢰 확보, 스니커즈·명품 등 카테고리 한정
+            </li>
+            <li>
+              <b>Fantry</b> · 위탁 → 플랫폼 검수 → 경매 → 낙찰·배송·정산까지 책임지는 아이돌 굿즈
+              경매 플랫폼
+            </li>
+          </ul>
+        </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Figure
             src="/images/fantry/main-page.png"
@@ -209,46 +216,35 @@ export default function Fantry() {
               tech: 'Redis + Lua Script',
               why: (
                 <>
-                  수업에서 인메모리 DB의 특성을 배우며 'RAM에서 읽고 쓰기 때문에 빠르고, 성능이
-                  필요한 작업에 쓸 수 있다'는 점이 기억에 남았습니다. 입찰마다 DB를 오가는 부담을
-                  줄이려 최고가 처리를 Redis로 옮겼습니다.
+                  입찰 1회당 DB select · update 왕복 제거, 조회 → 검증 → 갱신을 하나의 원자 연산으로
+                  처리
                 </>
               ),
               learned: (
                 <>
-                  요청 하나하나는 원자적이지만, '조회 → 비교 → 갱신'처럼 여러 단계를 묶으려면 추가
-                  처리가 필요함을 알게 됐고, 그래서 Lua Script를 도입했습니다.
+                  단일 명령만 원자적이고 다단계는 스크립트가 필요{' '}
+                  <a href="#troubleshooting" className="font-semibold text-accent hover:underline">
+                    → 트러블슈팅 02
+                  </a>
                 </>
               ),
             },
             {
               tech: 'WebSocket · STOMP',
-              why: (
-                <>
-                  입찰가는 모든 참가자의 화면에서 실시간으로 갱신되어야 합니다. 요청해야만 응답이
-                  오는 HTTP와 달리, 여러 탭에서 채팅처럼 갱신될 수 있도록 WebSocket을 도입하였습니다.
-                </>
-              ),
+              why: <>입찰가를 전체 참가자 화면에 즉시 반영 (HTTP 요청·응답 방식 대체)</>,
               learned: (
                 <>
-                  연결 수립이 일반 HTTP 요청과 다르다는 것을 배포 환경 장애로 배웠고(트러블슈팅
-                  01), 여러 환경에서 각각 테스트를 진행해야하는 이유를 알게되었습니다.
+                  연결 수립이 HTTP Upgrade라 프록시 설정에 의존{' '}
+                  <a href="#troubleshooting" className="font-semibold text-accent hover:underline">
+                    → 트러블슈팅 01
+                  </a>
                 </>
               ),
             },
             {
               tech: 'In-memory Queue',
-              why: (
-                <>
-                  입찰 기록을 건건이 저장하면 쓰기 부하가 그대로 DB에 갑니다. 별도 서버를 추가하지
-                  않고도 쓰기를 모아서 처리할 수 있는 Spring 안의 큐와 Batch 시스템을 선택했습니다.
-                </>
-              ),
-              learned: (
-                <>
-                  큐도 메모리에 있어 서버가 꺼지면 내용이 사라진다는 한계를 알게 됐고, Redis 서버 다운 대응 설계처럼 별도의 영속화 과정, 혹은 외부 서버 활용이 필요하다는 것을 학습하였습니다.
-                </>
-              ),
+              why: <>별도 서버 없이 쓰기를 모아 2초 주기 Batch Insert로 DB 쓰기 부하 완화</>,
+              learned: <>서버 종료 시 큐 유실 — 영속화는 미구현으로 남김</>,
             },
           ]}
         />
@@ -328,7 +324,11 @@ export default function Fantry() {
                 스크립트 하나로 처리. <br/>입찰 기록은 큐에 모아 2초 주기로 DB에 Batch Insert.
               </>
             }
-            result={<>K6 동시 입찰 시나리오 2,079개 검증 항목 전체 통과. (실패 0건)</>}
+            result={
+              <>
+                K6 동시 입찰 시나리오 <b>실패 0건</b>. 초당 15회 지속 입찰 중 최고가 정합성 유지.
+              </>
+            }
             detail={
               <>
                 <CodeBlock
@@ -368,14 +368,17 @@ public void flushBidLogToDB() {
                 </p>
                 <div>
                   <p className="mb-3">
-                    <b>검증 방법</b>: 초당 15회로 동시 입찰 요청을 지속 발생시키며
-                    3단계 체크(HTTP 로그인 → WebSocket 연결 → STOMP 연결) 수행 
-                    <br/> <b>결과:</b> 총 2,079개 검증 항목이 전부 통과. (Lua Script 가 트랜잭션과 동일한 효과를 내므로 정합성 보장)
-                    
+                    <b>검증 방법</b>: 초당 15회로 동시 입찰 요청을 지속 발생시키며 3단계
+                    체크(HTTP 로그인 → WebSocket 연결 → STOMP 연결) 수행
+                    <br />
+                    <b>결과</b>: 수행한 2,079개 checks 전부 통과, 실패 0건
+                    <br />
+                    <b>지표의 성격</b>: checks는 처리량·지연이 아닌 각 단계의 통과 여부. 동시 입찰
+                    상황에서 최고가 갱신이 어긋나지 않는지를 확인하는 용도로 사용
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <StatCard value="2,079개" label="검증 항목(checks) 전체 통과" />
-                    <StatCard value="100%" label="checks 성공률 (실패 0건)" />
+                    <StatCard value="0건" label="동시 입찰 시나리오 실패(checks failed)" />
+                    <StatCard value="2,079개" label="수행한 검증 항목(checks) 수" />
                   </div>
                 </div>
                 <CodeBlock
@@ -439,35 +442,25 @@ checks_failed......: 0.00%    0 out of 2079
         <Retrospect
           gains={[
             <>
-              <b>외부 시스템은 언제든 장애가 날 수 있다</b>는 전제로 대비책(DB Fallback)을
-              직접 설계해 봤습니다.
+              <b>외부 시스템 장애를 전제한 폴백 설계</b> — Redis 장애 감지 → DB 비관적 락 → 복구
+              시 동기화
             </>,
             <>
-              <b>Redis의 특성</b>(요청 하나하나가 원자적)을 이해했고, Redis 기준의 동시성 제어를
-              직접 다뤄봤습니다.
+              <b>Redis의 원자성 범위 파악</b>과 Lua Script 기반 동시성 제어
             </>,
             <>
-              실시간 통신(WebSocket)을 <b>연결 수립</b> 을 직접 다뤄본 경험을
-              얻었습니다.
+              <b>WebSocket 연결 수립 과정</b>과 프록시 Upgrade 헤더 의존성 (배포 환경 장애로 확인)
             </>,
             <>
-              Nginx 설정 하나로 연결이 강등되는 것을 겪으며, <b>'Local 환경과 서비스 환경은 다르다'</b> 라는 점을 확인했습니다.
+              <b>로컬 환경과 배포 환경의 동작 차이</b> 확인 — Nginx 설정 누락으로 Long-Polling 강등
             </>,
           ]}
           questions={[
-            <>Queue는 Redis와 마찬가지로 In-memory에 저장되기 때문에 휘발성을 가집니다.</>,
             <>
-              그렇다면 Queue에 저장되었던 데이터가 서버 다운과 함께 휘발된다면, 그 대비책은 어떻게
-              마련해야 하는지에 대한 고민이 이어졌습니다.
-            </>
+              Queue도 In-memory라 서버 종료 시 유실. 영속화 수단이나 외부 큐 도입에 대한 검토가
+              남음
+            </>,
           ]}
-          closing={
-            <>
-              코드를 그저 구현하는 것에 멈추지 않고, 여러 장애 상황에 대비해야하며,
-              <br/> 확장성과 외부 서버를 활용할때의 트레이드오프를 항상 고민해야한다는 것을 배웠습니다.
-              
-            </>
-          }
         />
       </Section>
     </>

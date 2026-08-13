@@ -294,11 +294,6 @@ ORDER BY root.category_name, top.category_name, sub.category_name
               많았습니다. 이 한계들이 다음 프로젝트의 공부 방향이 됐습니다.
             </>,
           ]}
-          closing={
-            <>
-              RDBMS 를 다룰때엔 쓰기,삭제도 중요하지만 연관 관계에 따른 성능 좋은 조회가 더욱 중요하다는 점을 배웠습니다.
-            </>
-          }
         />
       </Section>
     </>

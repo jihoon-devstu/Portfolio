@@ -217,6 +217,7 @@ export default function Ddasoom() {
           { id: 'overview', label: '어떤 프로젝트인가' },
           { id: 'role', label: '나의 자리' },
           { id: 'why', label: '왜 이 파트인가' },
+          { id: 'focus', label: '가장 파고든 것' },
           { id: 'architecture', label: '인증 아키텍처' },
           { id: 'whytech', label: '기술 선택' },
           { id: 'decisions', label: '결정 로그' },
@@ -230,9 +231,8 @@ export default function Ddasoom() {
 
       <Section id="overview" no="01" title="어떤 프로젝트인가">
         <p className="max-w-3xl leading-relaxed text-slate-700">
-          유기동물 정보는 지역과 기관마다 흩어져 있고, 바로 입양을 결심하기에는 부담이 큽니다.
-          따숨은 그 사이에 <b>'임시보호'라는 중간 단계</b>를 두어, 유기동물에게 따뜻한 손길이
-          이어지게 하는 커뮤니티 플랫폼입니다.
+          흩어진 유기동물 정보와 입양 사이에 <b>'임시보호'라는 중간 단계</b>를 두는 커뮤니티
+          플랫폼입니다.
         </p>
         <div className="mt-6 max-w-3xl border-l-2 border-accent-line pl-5 sm:pl-6">
           <ul className="space-y-2.5 text-base leading-relaxed text-slate-700">
@@ -359,43 +359,26 @@ export default function Ddasoom() {
           items={[
             {
               tech: 'JWT (세션 대신)',
-              why: (
-                <>
-                  Fantry에서는 팀원이 만든 JWT 인증 위에서 개발하며 그 구조를 겪었습니다. 이번에는 Spring Security 와 JWT를 직접 설계하고 검증해보고 싶어 선택했습니다.
-                </>
-              ),
+              why: <>서버 세션 없이 인증 상태 유지, Spring Security 필터 체인을 직접 구성</>,
               learned: (
                 <>
-                  '발급'도 중요하지만 '무효화'가 더욱 중요하다는 것을 배웠습니다. JWT를 다루는 방식(저장 위치, 여러 탭의 Reissue 요청 등)이 이 프로젝트에서의 가장 많이 고민한 부분입니다.
+                  발급보다 무효화가 어려움 — jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 설계{' '}
+                  <a href="#decisions" className="font-semibold text-accent hover:underline">
+                    → 결정 01 · 03
+                  </a>
                 </>
               ),
             },
             {
               tech: 'Redis',
-              why: (
-                <>
-                  Refresh Token 보관과 인증 코드처럼 '일정 시간이 지나면 사라져야 하는 값'이
-                  많았습니다. 따라서 DB에 저장하기보다, 유효 기간(TTL)을 걸면 알아서 지워지는 Redis가 이 일에 맞다고 판단했습니다.
-                </>
-              ),
-              learned: (
-                <>
-                  만료를 Redis에 맡기니 별도의 정리 작업 없어 깔끔했고, '시간이 지나면 사라져야 하는 값'을 다루는 도구로도 쓸 수 있음을 배웠습니다.
-                </>
-              ),
+              why: <>RT · 이메일 인증 코드 등 TTL이 필요한 값 보관</>,
+              learned: <>만료 정리 작업이 불필요한 대신, 요청당 조회 1회 → 2회를 감수</>,
             },
             {
               tech: 'QueryDSL',
-              why: (
-                <>
-                  관리자 회원 검색은 키워드·권한·상태 조건이 조합에 따라 달라집니다. 따라서 동적으로 조건에 따라 자바 코드로 조립할 수 있는 QueryDSL을 택했습니다.
-                </>
-              ),
+              why: <>관리자 회원 검색의 키워드 · 권한 · 상태 조건 조합을 자바 코드로 조립</>,
               learned: (
-                <>
-                  조건이 없으면 붙이지 않는 방식으로 '미지정 = 전체'를 자연스럽게 처리할 수 있었고,
-                  정렬처럼 SQL 표현이 필요한 부분은 따로 명시하는 방식을 익혔습니다.
-                </>
+                <>조건 미부착으로 '미지정 = 전체'를 처리, 정렬 같은 SQL 표현은 CASE로 명시</>
               ),
             },
           ]}
@@ -643,10 +626,12 @@ export default function Ddasoom() {
         <Bullets
           items={[
             <>
-              <b>ApiResponse</b>: 모든 응답을 단일 규격으로 통일하여 프론트와의 연계성 고려
+              <b>ApiResponse</b>: 전 API 응답을 <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">ApiResponse&lt;T&gt;</code> 단일 규격으로 통일 — 프론트가 성공/실패
+              분기를 한 곳에서 처리
             </>,
             <>
-              <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 일관된 에러 응답 고려
+              <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 예외를 단일 지점에서 처리하고,
+              도메인별 ErrorCode enum이 코드 · 메시지 · HTTP 상태를 함께 관리
             </>,
             <>
               <b>PageableSanitizer</b>: size , sort 등이 비정상적인 요청이 들어올 수 있음을 고려.
@@ -722,15 +707,20 @@ export default function Ddasoom() {
       <Section id="retrospect" no="12" title="성과와 배운 점">
         <Retrospect
           gains={[
-            <>Spring Security 기반의 인증 / 인가 인프라를 <b>직접 구현</b>한 경험</>,
             <>
-              AT / RT의 저장 및 재발급 방식에 따른 각각의 트러블슈팅과 공격 상황에 대한 고민과
-              성장
+              <b>Spring Security 필터 체인 기반 인증/인가 인프라 직접 구현</b>
             </>,
             <>
-              '발급'보다 '무효화'가 어렵다는 것 — 서버가 저장하지 않는 토큰의 무효화 처리에 대한 고민
+              <b>토큰 저장 위치 결정</b> — AT 프론트 메모리 / RT HttpOnly 쿠키 + Redis, XSS · CSRF
+              트레이드오프 비교
             </>,
-            <>모든 결정을 선택지·근거와 함께 문서로 남기는 협업 경험</>,
+            <>
+              <b>무효화 설계</b> — jti 블랙리스트 + 회원 단위 강제 로그아웃 마커, 요청당 Redis 조회
+              2회 감수
+            </>,
+            <>
+              <b>선택지 · 근거를 함께 남기는 결정 로그 문서화</b> (Notion → docs/SECURITY-FLOW)
+            </>,
           ]}
           questions={[
             <>
@@ -738,11 +728,6 @@ export default function Ddasoom() {
               필요
             </>,
           ]}
-          closing={
-            <>
-              트러블 슈팅 상황과 트레이드 오프 상황, 개발 근거들을 문서화 하는 습관이 정말 중요하다는 것을 느꼈습니다.
-            </>
-          }
         />
       </Section>
     </>
