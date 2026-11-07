@@ -1,6 +1,6 @@
 import ProjectHeader from '../components/ProjectHeader'
 import TroubleCard from '../components/TroubleCard'
-import { Bullets, CodeBlock, Figure, Highlight, Retrospect, RoleSplit, Section } from '../components/ui'
+import { Bullets, CodeBlock, Figure, Retrospect, RoleSplit, Section } from '../components/ui'
 
 /** 루트-탑-서브 3단계 카테고리 구조 다이어그램 */
 function CategoryDiagram() {
@@ -164,24 +164,13 @@ export default function IntelliMarket() {
         </p>
       </Section>
 
-      <Section id="focus" no="04" title="가장 파고든 것">
-        <Highlight
-          lines={['Spring과 DB가 어떻게 연결되고, JSP가 어떻게 화면이 되는지 — 웹의 기초를 익히는 것']}
-          gains={[
-            '요청이 Controller → Service → DAO → SQL을 거쳐 화면으로 돌아오는 전 과정을 직접 구성해 본 경험',
-            '화면(JSP)까지 함께 만들며 데이터가 사용자에게 닿는 마지막 순간까지 이해한 것',
-            '3단계 카테고리를 테이블로 설계하며 얻은 데이터 구조 설계의 기본기',
-          ]}
-        />
-      </Section>
-
-      <Section id="category" no="05" title="카테고리 구조 설계">
+      <Section id="category" no="04" title="카테고리 구조 설계">
         <CategoryDiagram />
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Figure
             src="/images/intellimarket/category-picker.png"
             alt="카테고리 선택 화면"
-            caption="설계한 3단계 구조가 동작하는 모습 · 대분류 → 중분류 → 소분류 연쇄 선택"
+            caption="상품 등록의 카테고리 선택 · 상위 → 하위 카테고리 연쇄 선택(Ajax)"
           />
           <Figure
             src="/images/intellimarket/store-erd.png"
@@ -191,7 +180,7 @@ export default function IntelliMarket() {
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="06" title="트러블슈팅">
+      <Section id="troubleshooting" no="05" title="트러블슈팅">
         <TroubleCard
           no={1}
           title="카테고리 조회가 유독 느리다? : 알고 보니 N+1"
@@ -208,40 +197,54 @@ export default function IntelliMarket() {
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">
                 &lt;association select="..."&gt;
               </code>{' '}
-              방식은 매핑할 때마다 쿼리를 다시 날림. sub → top → root로 연쇄되어{' '}
-              <b>서브 카테고리 N건 조회 시 1 + 2N개의 쿼리</b>가 실행되는 N+1 구조였음.
+              방식은 매핑할 때마다 쿼리를 다시 날림. 행마다 스토어 정보 · sub를 조회하고 sub →
+              top → root로 연쇄되어 <b>N건 조회 시 최대 1 + 4N개의 쿼리</b>(캐시 미적용 기준)가
+              실행되는 N+1 구조였음.
             </>
           }
           solution={
             <>
-              카테고리 트리 조회를 <b>4개 테이블 JOIN 단일 쿼리</b>로 재작성하고, 중첩{' '}
+              스토어 메인의 카테고리 트리 조회를 <b>4개 테이블 JOIN 쿼리</b>로 재작성하고, 중첩{' '}
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">&lt;association&gt;</code>{' '}
               resultMap으로 root → top → sub 계층 객체를 쿼리 결과에서 조립하도록 개선.
             </>
           }
           result={
             <>
-              트리 조회 쿼리가 <b>1 + 2N개에서 1개로</b> 줄었습니다. 이후 JPA에서도 Fetch Join으로
-              같은 문제를 예방하게 됐습니다.
+              카테고리 계층은 <b>JOIN 1회로 조립</b>. 스토어 정보 조회만 하위 select로 남아
+              같은 스토어 ID는 MyBatis 1차 캐시로 재사용. 상품 등록 · 카테고리 삭제 경로는 기존
+              매핑을 그대로 사용해 개선 범위가 트리 조회에 한정됨.
             </>
           }
           detail={
             <CodeBlock
-              title="개선 후: 4-테이블 JOIN + 중첩 resultMap (단일 쿼리)"
-              code={`SELECT sc.store_category_id, sub.sub_category_id, sub.category_name,
-       top.top_category_id, top.category_name, root.root_category_id, root.category_name
+              title="개선 후: 4-테이블 JOIN + 중첩 resultMap (StoreCategoryMapper.xml 발췌)"
+              code={`SELECT sc.store_category_id, sc.store_info_id,
+       sub.sub_category_id, sub.category_name AS sub_category_name,
+       top.top_category_id, top.category_name AS top_category_name,
+       root.root_category_id, root.category_name AS root_category_name
 FROM store_categories sc
 JOIN sub_categories  sub  ON sc.sub_category_id  = sub.sub_category_id
 JOIN top_categories  top  ON sub.top_category_id = top.top_category_id
 JOIN root_categories root ON top.root_category_id = root.root_category_id
 WHERE sc.store_info_id = #{storeInfoId}
-ORDER BY root.category_name, top.category_name, sub.category_name
+ORDER BY root.category_name ASC, top.category_name ASC, sub.category_name ASC
 
-<!-- resultMap: 중첩 association으로 계층 객체를 한 번에 조립 -->
+<!-- resultMap: 중첩 association으로 계층 객체를 조립 (스토어 정보만 하위 select) -->
 <resultMap id="storeCategoryFullMap" type="StoreCategory">
-  <association property="subCategory" resultMap="subMap">
-    <association property="topCategory" resultMap="topMap">
-      <association property="rootCategory" resultMap="rootMap"/>
+  <id column="store_category_id" property="storeCategoryId" />
+  <association property="storeInfo" column="store_info_id" javaType="StoreInfo"
+               select="com.intellimarket.store.dao.StoreInfoDAO.selectById" />
+  <association property="subCategory" javaType="SubCategory">
+    <id column="sub_category_id" property="subCategoryId" />
+    <result column="sub_category_name" property="categoryName" />
+    <association property="topCategory" javaType="TopCategory">
+      <id column="top_category_id" property="topCategoryId" />
+      <result column="top_category_name" property="categoryName" />
+      <association property="rootCategory" javaType="RootCategory">
+        <id column="root_category_id" property="rootCategoryId" />
+        <result column="root_category_name" property="categoryName" />
+      </association>
     </association>
   </association>
 </resultMap>`}
@@ -250,7 +253,7 @@ ORDER BY root.category_name, top.category_name, sub.category_name
         />
       </Section>
 
-      <Section id="order" no="07" title="상품 · 주문 관리">
+      <Section id="order" no="06" title="상품 · 주문 관리">
         <Bullets
           items={[
             <>
@@ -276,7 +279,7 @@ ORDER BY root.category_name, top.category_name, sub.category_name
         />
       </Section>
 
-      <Section id="retrospect" no="08" title="성과와 배운 점">
+      <Section id="retrospect" no="07" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
