@@ -1,7 +1,6 @@
 import ProjectHeader from '../components/ProjectHeader'
 import TroubleCard from '../components/TroubleCard'
 import {
-  Bullets,
   CodeBlock,
   Figure,
   Highlight,
@@ -35,9 +34,9 @@ function BidFlowDiagram() {
         </div>
         {arrow}
         <div className={`${box} border-accent-line bg-accent-soft text-accent-deep`}>
-          Redis Lua Script — 원자적 연산 (트랜잭션 효과)
+          Redis Lua Script — 원자적 실행
           <div className="mt-1 text-sm font-normal text-accent">
-            최고가 조회 → 검증 → 갱신을 단일 스크립트로 처리 (Race Condition 차단)
+            최고가 조회 → 검증(최소 증가액 1,000원) → 갱신을 단일 스크립트로 처리 (Race Condition 차단)
           </div>
         </div>
         {arrow}
@@ -45,21 +44,21 @@ function BidFlowDiagram() {
           <div className={`${box} border-slate-300 bg-white`}>
             실시간 브로드캐스트
             <div className="mt-1 text-sm font-normal text-slate-500">
-              /topic/auctions/{'{id}'} 구독자 전체 + SSE 알림
+              /topic/auctions/{'{id}'} 구독자 전체 + SSE 알림(정상 모드)
             </div>
           </div>
           <div className={`${box} border-slate-300 bg-white`}>
             In-memory Queue에 Bid 객체 적재
             <div className="mt-1 text-sm font-normal text-slate-500">
-              LinkedBlockingQueue → 2초 주기 Batch Insert
+              LinkedBlockingQueue → 2초 주기 일괄 저장(saveAll)
             </div>
           </div>
         </div>
         <div className="pt-3">
           <div className={`${box} border-dashed border-slate-400 bg-white text-slate-700`}>
-            ⚠ Redis 장애 감지 시 — DB Fallback Mode
+            ⚠ Redis 호출 예외 발생 시 — DB Fallback Mode
             <div className="mt-1 text-sm font-normal text-slate-500">
-              DB 기준 입찰 처리(비관적 락 도입)로 전환, 복구 시 자가 치유
+              DB 기준 입찰 처리(비관적 락)로 전환, 다음 요청에서 Redis 재동기화 성공 시 자동 복귀
             </div>
           </div>
         </div>
@@ -85,7 +84,7 @@ export default function Fantry() {
           { label: '기간', value: '2025.09 – 2025.10 (약 3주)' },
           { label: '팀 구성', value: 'Full Stack 5명' },
           { label: '담당', value: '실시간 경매 시스템 총괄' },
-          { label: '검증', value: 'K6 동시 입찰 시나리오 통과' },
+          { label: '검증', value: 'K6 동시 접속 · 입찰 흐름 확인' },
         ]}
         stacks={[
           'Java 21',
@@ -114,7 +113,6 @@ export default function Fantry() {
           { id: 'architecture', label: '입찰 아키텍처' },
           { id: 'whytech', label: '기술 선택' },
           { id: 'troubleshooting', label: '트러블슈팅' },
-          { id: 'etc', label: '그 외 구현' },
           { id: 'retrospect', label: '성과와 배운 점' },
         ]}
       />
@@ -188,7 +186,7 @@ export default function Fantry() {
           gains={[
             '실시간 통신(WebSocket · STOMP) 연결을 직접 다뤄본 점',
             'Race Condition이 왜 위험하고, 동시성 제어는 어떻게 하는지 고민해 보게 된 점',
-            '여러 요청을 한 번에 처리하는 Batch Insert 설계 및 구현 경험',
+            '입찰 기록을 큐에 모아 주기적으로 저장하는 일괄 저장 설계 경험',
             'Spring Scheduler를 활용한 자동화 시스템 설계 및 구현 경험',
             '외부 서버(Redis)가 죽는 상황까지 대비하는 장애 대응 설계 경험',
           ]}
@@ -199,7 +197,7 @@ export default function Fantry() {
         id="architecture"
         no="05"
         title="입찰 처리 아키텍처"
-        subtitle="검증은 Redis에서, DB저장은 Spring Queue 를 거쳐 Batch Insert 로 처리합니다."
+        subtitle="검증은 Redis에서, DB 저장은 In-memory Queue(LinkedBlockingQueue)에 모아 2초 주기로 처리합니다."
       >
         <BidFlowDiagram />
       </Section>
@@ -243,8 +241,13 @@ export default function Fantry() {
             },
             {
               tech: 'In-memory Queue',
-              why: <>별도 서버 없이 쓰기를 모아 2초 주기 Batch Insert로 DB 쓰기 부하 완화</>,
-              learned: <>서버 종료 시 큐 유실 — 영속화는 미구현으로 남김</>,
+              why: <>별도 서버 없이 입찰 기록을 모아 2초 주기로 저장, 입찰 요청마다 DB 쓰기 회피</>,
+              learned: (
+                <>
+                  서버 종료 시 큐 유실(영속화 미구현). ID가 IDENTITY 전략이라 JDBC 배치가 꺼져
+                  INSERT는 건별 실행됨을 이후 확인
+                </>
+              ),
             },
           ]}
         />
@@ -305,8 +308,8 @@ export default function Fantry() {
             title="입찰마다 DB 접근: 성능 저하와 Race Condition"
             problem={
               <>
-                입찰마다 DB로 최고가를 조회/검증/갱신. 이는 @Transactional로 정합성이 보장되지만, 성능이 너무 좋지 않음.
-                <br/>(입찰 1회당 DB로 select, update 하는 쿼리가 각 1회씩 날아감.)
+                입찰마다 DB로 최고가를 조회/검증/갱신 (입찰 1회당 select · update 각 1회).
+                <br/>트랜잭션만으로는 동시 입찰의 갱신 손실을 막을 수 없고, 락을 걸면 입찰이 몰릴 때 대기가 길어질 것이 우려됨.
                 <br/> → DB 접근을 줄이기 위하여 Redis를 도입하자 새로운 문제 발생
               </>
             }
@@ -319,14 +322,15 @@ export default function Fantry() {
             }
             solution={
               <>
-                Redis 에서도 트랜잭션 효과를 낼 수 있는{' '}
+                스크립트 전체가 원자적으로 실행되는{' '}
                 <b>Lua Script</b>를 도입하여 조회/검증/갱신을
-                스크립트 하나로 처리. <br/>입찰 기록은 큐에 모아 2초 주기로 DB에 Batch Insert.
+                스크립트 하나로 처리. <br/>입찰 기록은 큐에 모아 2초 주기로 DB에 일괄 저장.
               </>
             }
             result={
               <>
-                K6 동시 입찰 시나리오 <b>실패 0건</b>. 초당 15회 지속 입찰 중 최고가 정합성 유지.
+                조회~갱신 사이에 다른 입찰이 끼어들 틈 제거. K6 동시 접속 · 입찰 시나리오(초당 15회)
+                checks <b>2,079개 전부 통과</b>.
               </>
             }
             detail={
@@ -352,14 +356,14 @@ end
 return "FAILURE_TOO_LOW_INCREMENT"`}
                 />
                 <CodeBlock
-                  title="BidScheduler: In-memory Queue 기반 Batch Insert"
+                  title="BidScheduler: In-memory Queue 기반 일괄 저장"
                   code={`@Scheduled(fixedDelay = 2000)
 @Transactional
 public void flushBidLogToDB() {
     if (bidLogQueue.isEmpty()) return;      // 빈 큐면 DB 접근 자체를 회피
     List<Bid> bidsToSave = new ArrayList<>();
     bidLogQueue.drainTo(bidsToSave);        // 원자적으로 전량 이동 (생산자와 경합 안전)
-    bidRepository.saveAll(bidsToSave);      // 일괄 INSERT
+    bidRepository.saveAll(bidsToSave);      // 한 트랜잭션에서 저장 (IDENTITY라 INSERT는 건별)
 }`}
                 />
                 <p>
@@ -373,11 +377,11 @@ public void flushBidLogToDB() {
                     <br />
                     <b>결과</b>: 수행한 2,079개 checks 전부 통과, 실패 0건
                     <br />
-                    <b>지표의 성격</b>: checks는 처리량·지연이 아닌 각 단계의 통과 여부. 동시 입찰
-                    상황에서 최고가 갱신이 어긋나지 않는지를 확인하는 용도로 사용
+                    <b>지표의 성격</b>: checks는 각 단계(로그인 · 연결)의 통과 여부. 처리량 · 지연이나
+                    최고가 정합성을 직접 측정한 지표는 아님
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <StatCard value="0건" label="동시 입찰 시나리오 실패(checks failed)" />
+                    <StatCard value="0건" label="시나리오 checks 실패(checks failed)" />
                     <StatCard value="2,079개" label="수행한 검증 항목(checks) 수" />
                   </div>
                 </div>
@@ -409,12 +413,12 @@ checks_failed......: 0.00%    0 out of 2079
             cause={<>최고가 조회/검증/갱신 경로 전체가 Redis 하나에 의존하고 있었기 때문.</>}
             solution={
               <>
-                Redis 서버 장애 감지 시 <b>DB Fallback mode 돌입</b> (동시성 제어를 위한 비관적 락 처리),
-                <br/> Redis 서버 복구 시 이를 감지하여 DB와 Redis를 동기화(자가 치유)한 후, Redis를 이용한 입찰 기능이 자동 회복되도록 설계.
+                Redis 호출에서 예외(DataAccessException) 발생 시 <b>DB Fallback mode 전환</b> (동시성 제어를 위한 비관적 락 처리).
+                <br/> 이후 입찰 요청마다 해당 경매의 최고가를 DB → Redis로 재동기화해 보고, 성공하면 Redis 입찰로 자동 복귀.
               </>
             }
             result={
-              <>Redis 서버가 다운되어도, DB만을 활용한 입찰이 계속되고, Redis 서버 정상 작동을 감지하여 정상 모드로 복귀합니다.</>
+              <>Redis 서버가 다운되어도 DB만으로 입찰이 계속되고, Redis가 돌아오면 정상 모드로 복귀.</>
             }
             detail={
               <Figure
@@ -427,38 +431,33 @@ checks_failed......: 0.00%    0 out of 2079
         </div>
       </Section>
 
-      <Section id="etc" no="08" title="그 외 구현">
-        <Bullets
-          items={[
-            <>
-              <b>@Scheduled 기반 경매 라이프사이클</b>: 경매 자동 활성화/마감과 낙찰 확정, 주문
-              자동 생성 및 2초 주기 입찰 기록 일괄 저장(Batch Insert) 구현
-            </>,
-          ]}
-        />
-      </Section>
-
-      <Section id="retrospect" no="09" title="성과와 배운 점">
+      <Section id="retrospect" no="08" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
-              <b>외부 시스템 장애를 전제한 폴백 설계</b> — Redis 장애 감지 → DB 비관적 락 → 복구
-              시 동기화
+              <b>외부 시스템 장애를 전제한 폴백 설계</b> — Redis 예외 시 DB 비관적 락 전환 →
+              재동기화 성공 시 복귀
             </>,
             <>
               <b>Redis의 원자성 범위 파악</b>과 Lua Script 기반 동시성 제어
             </>,
             <>
-              <b>WebSocket 연결 수립 과정</b>과 프록시 Upgrade 헤더 의존성 (배포 환경 장애로 확인)
-            </>,
-            <>
-              <b>로컬 환경과 배포 환경의 동작 차이</b> 확인 — Nginx 설정 누락으로 Long-Polling 강등
+              <b>WebSocket 연결 수립 과정</b>과 프록시 Upgrade 헤더 의존성 — 로컬/배포 환경
+              차이(Nginx 설정 누락)로 확인
             </>,
           ]}
           questions={[
             <>
               Queue도 In-memory라 서버 종료 시 유실. 영속화 수단이나 외부 큐 도입에 대한 검토가
               남음
+            </>,
+            <>
+              Fallback 복귀 시 재동기화는 요청이 들어온 경매 1건만 대상이고, 모드 플래그도 서버
+              인스턴스 안에만 있음. 여러 경매 · 여러 서버 상황의 동기화는 미해결
+            </>,
+            <>
+              IDENTITY 전략에서는 JDBC 배치 INSERT가 동작하지 않음. 실제 배치 저장을 위해
+              JdbcTemplate batchUpdate 등의 검토가 남음
             </>,
           ]}
         />
