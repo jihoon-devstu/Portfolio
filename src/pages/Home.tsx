@@ -7,7 +7,7 @@ const VALUES = [
   {
     key: 'Why',
     title: '왜 이 기술인가',
-    body: "단순히 '동작하는 코드'가 아닌, 왜 이 기술이 필요한지와 대안은 무엇인지, 트레이드오프를 끊임없이 고민합니다. ",
+    body: "단순히 '동작하는 코드'가 아닌, 왜 이 기술이 필요한지와 대안은 무엇인지, 트레이드오프를 고민합니다.",
   },
   {
     key: 'How',
@@ -17,7 +17,7 @@ const VALUES = [
   {
     key: 'Result',
     title: '결과',
-    body: 'Why와 How를 바탕으로 팀원들과 성숙한 협업을 이루어냈고, 6개월의 부트캠프를 최우수 팀으로 수료했습니다.',
+    body: '6개월 부트캠프를 최우수 팀으로 수료했습니다.',
   },
 ]
 
@@ -50,7 +50,7 @@ const TIMELINE: {
   {
     period: '2025.11 – 2026.04',
     title: '개선 방향 학습 · 자격증 준비',
-    desc: '이전 프로젝트가 남긴 한계의 개선 방향 학습, SQLD·정보처리기사 준비',
+    desc: '이전 프로젝트가 남긴 한계의 개선 방향 학습, SQLD 취득',
     highlight: false,
   },
   {
@@ -65,7 +65,6 @@ const TIMELINE: {
 /** 자격증 */
 const CERTIFICATES = [
   { name: 'SQLD (SQL 개발자)', date: '2026.06', note: '한국데이터산업진흥원' },
-  { name: '정보처리기사', date: '필기 합격 · 실기 진행 중', note: '한국산업인력공단' },
   { name: 'JLPT N1', date: '2019.08', note: '일본어능력시험 최상위 급수' },
 ]
 
@@ -75,17 +74,17 @@ const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string
     title: '동시성 제어와 성능',
     desc: [
       '입찰 조회·검증·갱신을 Redis Lua Script 단일 원자 연산으로 처리',
-      'Redis 장애 시 DB 비관적 락으로 전환, 복구 감지 후 동기화',
-      '입찰 기록은 In-memory Queue → 2초 주기 Batch Insert',
+      'Redis 예외 시 DB 비관적 락으로 전환, 재동기화 성공 시 복귀',
+      '입찰 기록은 In-memory Queue에 모아 2초 주기로 일괄 저장',
     ],
-    tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'Batch Insert'],
+    tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'In-memory Queue'],
     from: 'Fantry에서 경험',
   },
   {
     title: '인증과 보안 설계',
     desc: [
       'AT는 프론트 메모리, RT는 HttpOnly 쿠키 + Redis (localStorage 배제)',
-      'RT 로테이션 + Grace Period 30초로 멀티탭 재발급 경합 해소',
+      'RT 로테이션 — 재발급마다 새 RT로 교체',
       'jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 즉시 차단',
     ],
     tags: ['Spring Security', 'JWT · OAuth2', 'Redis TTL 설계'],
@@ -95,7 +94,7 @@ const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string
     title: '데이터 모델링과 쿼리',
     desc: [
       '3단계 카테고리 + 스토어 N:M 매핑 테이블 설계',
-      'MyBatis association N+1 개선 — 4테이블 JOIN + 중첩 resultMap, 쿼리 1+2N → 1',
+      'MyBatis association 연쇄 조회(N+1) 개선 — 4테이블 JOIN + 중첩 resultMap',
       'QueryDSL 동적 조건 조합으로 관리자 검색 구현',
     ],
     tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
@@ -130,7 +129,7 @@ const PROJECTS = [
     name: 'Fantry',
     summary: '실시간 중고 경매 플랫폼 — 실시간 경매 시스템 담당',
     highlight:
-      'DB 트랜잭션 → Redis Lua Script 동시성 제어 → DB Fallback → Batch Insert 단계적 고도화',
+      'DB 직접 처리 → Redis Lua Script 동시성 제어 → DB Fallback → 큐 기반 일괄 저장 단계적 고도화',
     tags: ['WebSocket·STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
     badge: '대표 프로젝트',
   },
@@ -140,8 +139,8 @@ const PROJECTS = [
     name: 'Ddasoom (따숨)',
     summary: '유기동물 임시보호 플랫폼 — 팀장 · 회원/보안/공통모듈',
     highlight:
-      'Spring Security 인증/인가 인프라 설계 — 토큰 저장 위치, RT 로테이션, 강제 로그아웃 마커 결정 로그 3건',
-    tags: ['Spring Security', 'JWT 로테이션', 'OAuth2', 'Redis'],
+      'Spring Security 인증/인가 인프라 설계 — 토큰 저장 위치, 강제 로그아웃 마커 결정 로그 2건',
+    tags: ['Spring Security', 'JWT', 'OAuth2', 'Redis'],
     badge: '팀장',
   },
   {
@@ -150,7 +149,7 @@ const PROJECTS = [
     name: 'intelliMarket',
     summary: 'JSP 기반 SSR 쇼핑몰 — 스토어 상품/주문 관리',
     highlight:
-      'Spring Legacy · JSP 환경에서 3단계 카테고리 설계, MyBatis N+1 개선 (쿼리 1+2N → 1)',
+      'Spring Legacy · JSP 환경에서 3단계 카테고리 설계, MyBatis N+1 개선 (연쇄 조회 → JOIN)',
     tags: ['Spring Legacy', 'MyBatis', 'N+1 개선', 'JSP SSR'],
     badge: null,
   },
@@ -216,14 +215,6 @@ export default function Home() {
               <p className="mt-2 text-base leading-relaxed text-slate-600">{v.body}</p>
             </div>
           ))}
-        </div>
-
-        {/* 전직 서사 — 커머스 운영자에서 백엔드 개발자로 */}
-        <div className="mt-10 border-l-2 border-accent-line pl-5 sm:pl-6">
-          <p className="max-w-3xl leading-relaxed text-slate-700">
-            개발 전 4년 4개월, SK가스 마케팅 대행과 네이버 스마트스토어 두 곳을 운영하며 {' '}
-            <b>회사 협업 경험을 쌓았습니다.</b> 
-          </p>
         </div>
 
         {/* 학력·경력 타임라인 */}
