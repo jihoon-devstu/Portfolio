@@ -160,6 +160,7 @@ export default function Gotgan() {
         items={[
           { id: 'overview', label: '어떤 프로젝트인가' },
           { id: 'role', label: '나의 자리' },
+          { id: 'docs', label: '문서 · 목업' },
           { id: 'architecture', label: '전체 구성' },
           { id: 'design', label: '맡은 설계' },
           { id: 'loadtest', label: '부하테스트' },
@@ -191,6 +192,20 @@ export default function Gotgan() {
           <StatCard value="1,902개" label="테스트 케이스" />
           <StatCard value="62건" label="트러블슈팅 기록" />
         </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <Figure
+            src="/images/gotgan/service-main.png"
+            alt="곳간 쇼핑몰 메인 화면"
+            caption="배포된 쇼핑몰 메인 · 카테고리 · 기획전"
+            imgClassName="h-64 object-cover object-top"
+          />
+          <Figure
+            src="/images/gotgan/service-store.png"
+            alt="곳간 판매자 스토어 화면"
+            caption="판매자 스토어 · 입점한 작은 가게마다 자기 스토어 운영"
+            imgClassName="h-64 object-cover object-top"
+          />
+        </div>
       </Section>
 
       <Section
@@ -220,8 +235,76 @@ export default function Gotgan() {
       </Section>
 
       <Section
-        id="architecture"
+        id="docs"
         no="03"
+        title="문서와 목업으로 방향 맞추기"
+        subtitle="시작 전에 가이드 문서 사이트와 목업을 직접 만들어 팀의 기준으로 삼고, 개발하면서 실제에 맞게 함께 고쳐 나갔습니다."
+      >
+        <Bullets
+          items={[
+            <>
+              <b>가이드 문서 3종</b>: 가이드라인(왜 — 설계 배경과 결정 이유, 22개 장) · 스펙(무엇을 —
+              도메인별 요구사항 145건 · 파트별 스펙) · 컨벤션(어떻게 — 코드 · DB · 프론트 · 인프라 규칙)
+            </>,
+            <>
+              <b>결정은 바로 문서로</b>: 1차 멘토링 뒤 "기능 수가 아니라 장애 격리 · 자동 복구를 보여
+              주는 MSA"로 가이드라인을 개정하고, 이후 회의 결정도 바로 반영. 첫 작성 뒤 98번
+              갱신(커밋)했고 팀원도 자기 영역을 직접 고침
+            </>,
+            <>
+              <b>목업 56개 화면</b>: 요구사항과 화면 구현의 기준. 프론트에 이식한 뒤 API 로 하나씩
+              교체하고, 마지막에는 목업을 실제 화면 기준으로 다시 맞춤. 상표 · 초상권 문제가 있는
+              이미지 75장은 교체
+            </>,
+            <>
+              <b>AI 작업의 기준으로도 사용</b>: 가이드라인 · 컨벤션을 AI 작업 컨텍스트로 넣어 사람과
+              AI 가 같은 규칙을 따르게 함
+            </>,
+          ]}
+        />
+        <div className="mt-4 flex flex-wrap gap-5 text-sm font-semibold">
+          <a
+            href="https://gotganguide.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-ink underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+          >
+            가이드 문서 사이트 ↗
+          </a>
+          <a
+            href="https://mockup-page-sable.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-ink underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+          >
+            목업 페이지 ↗
+          </a>
+        </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <Figure
+            src="/images/gotgan/guide-home.png"
+            alt="가이드 문서 사이트 홈"
+            caption="가이드 문서 사이트 · 왜 / 무엇을 / 어떻게 3종 + 목업 바로가기"
+            imgClassName="h-48 object-cover object-top"
+          />
+          <Figure
+            src="/images/gotgan/guide-guideline.png"
+            alt="가이드라인 문서"
+            caption="가이드라인 · 질문별 결론 요약과 22개 장"
+            imgClassName="h-48 object-cover object-top"
+          />
+          <Figure
+            src="/images/gotgan/mockup-admin.png"
+            alt="목업 관리자 대시보드"
+            caption="목업 · 관리자 운영 대시보드"
+            imgClassName="h-48 object-cover object-top"
+          />
+        </div>
+      </Section>
+
+      <Section
+        id="architecture"
+        no="04"
         title="전체 구성"
         subtitle="요청 한 건이 지나가는 길입니다. 인프라 전체는 Terraform 코드로 매일 08:00 에 만들고 22:00 에 지웁니다."
       >
@@ -244,7 +327,7 @@ export default function Gotgan() {
 
       <Section
         id="design"
-        no="04"
+        no="05"
         title="내가 맡은 설계"
         subtitle="무엇을 선택했고, 그 대가로 무엇을 감수했는지 정리했습니다."
       >
@@ -331,7 +414,7 @@ export default function Gotgan() {
 
       <Section
         id="loadtest"
-        no="05"
+        no="06"
         title="부하테스트 — 측정하고, 고치고, 다시 측정"
         subtitle="운영과 같은 경로(Route 53 → NLB → gateway)로 k6 시나리오 7개를 돌리고, 찾은 문제를 고쳐 같은 시나리오로 다시 쟀습니다."
       >
@@ -352,7 +435,7 @@ export default function Gotgan() {
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="06" title="트러블슈팅">
+      <Section id="troubleshooting" no="07" title="트러블슈팅">
         <div className="space-y-8">
           <TroubleCard
             no={1}
@@ -478,7 +561,7 @@ export default function Gotgan() {
 
       <Section
         id="collab"
-        no="07"
+        no="08"
         title="AI 코드리뷰와 협업"
         subtitle="AI 를 리뷰어로 쓰되, 기준을 먼저 정하고 결과는 근거를 직접 확인했습니다."
       >
@@ -506,7 +589,7 @@ export default function Gotgan() {
         />
       </Section>
 
-      <Section id="retrospect" no="08" title="성과와 배운 점">
+      <Section id="retrospect" no="09" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
