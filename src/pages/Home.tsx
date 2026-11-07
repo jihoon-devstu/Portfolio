@@ -15,9 +15,9 @@ const VALUES = [
     body: "노션, 코드리뷰 코멘트 등 기록 습관을 들이고 컨벤션을 설계하는 등 '체계적인 의사소통'을 지향합니다.",
   },
   {
-    key: 'Result',
-    title: '결과',
-    body: '6개월 부트캠프를 최우수 팀으로 수료했습니다.',
+    key: 'AI',
+    title: '어떻게 AI와 일하는가',
+    body: 'AI가 작성한 코드도 직접 읽고 검증한 뒤 책임집니다. 구조를 알아야 정확하게 지시할 수 있기에 도메인 · 서비스 · 인프라 구조를 이해하는 데 시간을 쓰고, 곳간에서는 리뷰 기준을 문서(하네스)로 정해 AI 코드리뷰에 적용했습니다.',
   },
 ]
 
@@ -56,7 +56,7 @@ const TIMELINE: {
   {
     period: '2026.05 – 2026.11',
     title: '청년취업사관학교 새싹(SeSAC) 영등포캠퍼스 8기',
-    desc: 'MSA 기반 웹 서비스 개발 과정 수강 중 · 첫 미니 프로젝트로 따숨(Ddasoom) 개발',
+    desc: 'MSA 기반 웹 서비스 개발 과정 · 미니 프로젝트 따숨(Ddasoom), 최종 프로젝트 곳간(GOTGAN) 개발',
     highlight: true,
     ongoing: true,
   },
@@ -71,34 +71,44 @@ const CERTIFICATES = [
 /** 핵심 역량 — 프로젝트에서 실제로 부딪히며 배운 것 중심 */
 const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string }[] = [
   {
+    title: '클라우드 인프라와 운영',
+    desc: [
+      'Terraform으로 VPC · EKS · SNS/SQS · S3 · Lambda 구성, 매일 08:00 생성 · 22:00 삭제 자동화',
+      'GitHub Actions → ECR → Argo CD GitOps 배포 흐름 위에서 운영',
+      'IRSA · IMDSv2로 파드별 최소 권한, k6 측정값으로 힙 · DB 연결 · 레플리카 결정',
+    ],
+    tags: ['AWS EKS', 'Terraform', 'Kubernetes · Helm', 'Argo CD'],
+    from: '곳간에서 경험',
+  },
+  {
+    title: '분산 환경의 정합성',
+    desc: [
+      '서비스 10개를 1홉 동기 호출(타임아웃 · 서킷) + 이벤트로 연결',
+      '아웃박스 · eventId 멱등 · 발생 시각 비교로 이벤트 유실 · 중복 · 순서 문제 처리',
+      '결제 취소는 선기록 → PG 호출 → 확정, 결과를 모르면 PG 조회로 대조',
+    ],
+    tags: ['MSA', 'SNS · SQS', 'Resilience4j', 'Saga · 보상'],
+    from: '곳간에서 경험',
+  },
+  {
     title: '동시성 제어와 성능',
     desc: [
       '입찰 조회·검증·갱신을 Redis Lua Script 단일 원자 연산으로 처리',
       'Redis 예외 시 DB 비관적 락으로 전환, 재동기화 성공 시 복귀',
-      '입찰 기록은 In-memory Queue에 모아 2초 주기로 일괄 저장',
+      '부하테스트로 동시성 버그 4개 발견 → 수정 → 재측정 (동시 주문 500 오류 71 → 0)',
     ],
-    tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'In-memory Queue'],
-    from: 'Fantry에서 경험',
+    tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'k6'],
+    from: 'Fantry · 곳간에서 경험',
   },
   {
     title: '인증과 보안 설계',
     desc: [
-      'AT는 프론트 메모리, RT는 HttpOnly 쿠키 + Redis (localStorage 배제)',
-      'RT 로테이션 — 재발급마다 새 RT로 교체',
+      'AT는 프론트 메모리, RT는 HttpOnly 쿠키 + Redis, 재발급마다 RT 교체',
       'jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 즉시 차단',
+      'WebSocket 전송 목적지 검사 · 업로드 파일 실제 형식 검사(Lambda)',
     ],
-    tags: ['Spring Security', 'JWT · OAuth2', 'Redis TTL 설계'],
-    from: 'Ddasoom에서 경험',
-  },
-  {
-    title: '데이터 모델링과 쿼리',
-    desc: [
-      '3단계 카테고리 + 스토어 N:M 매핑 테이블 설계',
-      'MyBatis association 연쇄 조회(N+1) 개선 — 4테이블 JOIN + 중첩 resultMap',
-      'QueryDSL 동적 조건 조합으로 관리자 검색 구현',
-    ],
-    tags: ['MySQL · ERD 설계', 'JPA · QueryDSL', 'MyBatis', 'N+1 개선'],
-    from: 'intelliMarket · Ddasoom에서 경험',
+    tags: ['Spring Security', 'JWT · OAuth2', 'Keycloak', 'Redis TTL 설계'],
+    from: 'Ddasoom · 곳간에서 경험',
   },
 ]
 
@@ -109,12 +119,24 @@ const STACKS: { group: string; items: string[] }[] = [
     items: ['Java', 'Spring Boot', 'Spring Security', 'Spring Data JPA', 'MyBatis', 'QueryDSL', 'Spring Legacy'],
   },
   {
-    group: 'Database · Infra',
-    items: ['MySQL', 'Oracle', 'Redis', 'WebSocket · STOMP', 'Flyway'],
+    group: 'MSA',
+    items: ['Spring Cloud Gateway', 'Resilience4j', 'Keycloak', 'SNS · SQS (아웃박스)', 'WebSocket · STOMP', 'SSE'],
+  },
+  {
+    group: 'Database',
+    items: ['MySQL', 'Oracle', 'Redis', 'DynamoDB', 'Flyway'],
+  },
+  {
+    group: 'Cloud · DevOps',
+    items: ['AWS (EKS · Lambda · S3 · Route 53)', 'Terraform', 'Docker', 'Kubernetes', 'Helm', 'GitHub Actions', 'Argo CD'],
+  },
+  {
+    group: 'Observability · Test',
+    items: ['Prometheus', 'Loki', 'Grafana', 'Zipkin', 'k6', 'SonarQube Cloud'],
   },
   {
     group: 'Frontend',
-    items: ['HTML5 · CSS3','JavaScript (ES6+)', 'Vue 3', 'React', 'JSP · JSTL'],
+    items: ['HTML5 · CSS3','JavaScript (ES6+)', 'TypeScript', 'React', 'Vue 3', 'JSP · JSTL'],
   },
   {
     group: 'Tools · 협업',
@@ -124,6 +146,16 @@ const STACKS: { group: string; items: string[] }[] = [
 
 const PROJECTS = [
   {
+    to: '/gotgan',
+    period: '2026.10 – 2026.11',
+    name: '곳간 (GOTGAN)',
+    summary: 'MSA 멀티 스토어 오픈마켓 — AWS 인프라 · 결제 · 정산 · 관리자 · 채팅',
+    highlight:
+      '서비스 10개를 Terraform 으로 만든 EKS 에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (동시 주문 500 오류 71 → 0)',
+    tags: ['AWS EKS · Terraform', 'MSA', 'SNS · SQS 아웃박스', 'k6 부하테스트'],
+    badge: '대표 프로젝트',
+  },
+  {
     to: '/fantry',
     period: '2025.09 – 2025.10',
     name: 'Fantry',
@@ -131,7 +163,7 @@ const PROJECTS = [
     highlight:
       'DB 직접 처리 → Redis Lua Script 동시성 제어 → DB Fallback → 큐 기반 일괄 저장 단계적 고도화',
     tags: ['WebSocket·STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
-    badge: '대표 프로젝트',
+    badge: null,
   },
   {
     to: '/ddasoom',
@@ -179,6 +211,11 @@ export default function Home() {
             <br />
             끊임없이 생각하는 개발자, 구지훈입니다.
           </h1>
+          <p className="mt-5 max-w-2xl leading-relaxed text-slate-600">
+            AI 가 코드를 쓰는 시간이 늘수록 구조를 이해하고 설계하는 능력이 중요하다고 봅니다.{' '}
+            <br className="hidden sm:block" />
+            AI 활용 능력과 설계 능력을 함께 키우는 백엔드 개발자를 목표로 합니다.
+          </p>
           <div className="mt-9 flex flex-wrap items-center gap-7">
             <a
               href={CONTACT.github}
@@ -270,7 +307,7 @@ export default function Home() {
         <p className="mt-2 text-slate-500">프로젝트에서 실제로 부딪히며 배운 것 중심입니다.</p>
 
         {/* 핵심 역량 */}
-        <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-6">
+        <div className="mt-8 grid gap-8 md:grid-cols-2 md:gap-x-8 md:gap-y-10">
           {CORE_SKILLS.map((s) => (
             <div key={s.title} className="flex flex-col border-t-2 border-accent-line pt-4">
               <h3 className="text-lg font-bold text-ink">{s.title}</h3>
