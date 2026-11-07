@@ -5,12 +5,10 @@ import {
   Bullets,
   Expand,
   Figure,
-  Highlight,
   Retrospect,
   RoleSplit,
   Section,
   SectionNav,
-  WhyTech,
 } from '../components/ui'
 
 /** Access / Refresh 토큰 전략 비교 표 */
@@ -51,7 +49,7 @@ function FilterChainDiagram() {
   const steps = [
     { title: '① 서명·만료 검증', desc: 'parseClaims: 위조/만료 토큰 즉시 차단', cost: 'CPU 연산' },
     { title: '② category 확인', desc: 'RT를 AT 자리에 꽂는 오용 차단', cost: 'CPU 연산' },
-    { title: '③ jti 블랙리스트등록 여부 확인', desc: '로그아웃된 토큰(고유번호 jti)인지 확인', cost: 'Redis 1회' },
+    { title: '③ jti 블랙리스트 등록 여부 확인', desc: '로그아웃된 토큰(고유번호 jti)인지 확인', cost: 'Redis 1회' },
     { title: '④ 강제 로그아웃 마커 등록 여부 확인', desc: '탈퇴·제재 회원의 모든 토큰 차단', cost: 'Redis 1회' },
     { title: '⑤ 인증 객체 구성', desc: 'memberId + role 을 담은 UserDetails 객체 생성'},
   ]
@@ -62,9 +60,11 @@ function FilterChainDiagram() {
           <div key={s.title} className="relative rounded-md border border-slate-300 bg-white p-4">
             <div className="text-base font-bold text-ink">{s.title}</div>
             <div className="mt-1.5 text-sm leading-snug text-slate-500">{s.desc}</div>
-            <div className="mt-2.5 inline-block rounded bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-deep">
-              {s.cost}
-            </div>
+            {s.cost && (
+              <div className="mt-2.5 inline-block rounded bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-deep">
+                {s.cost}
+              </div>
+            )}
             {i < steps.length - 1 && (
               <span className="absolute -right-2.5 top-1/2 hidden -translate-y-1/2 text-slate-300 sm:block">
                 →
@@ -214,22 +214,16 @@ export default function Ddasoom() {
 
       <SectionNav
         items={[
-          { id: 'overview', label: '어떤 프로젝트인가' },
-          { id: 'role', label: '나의 자리' },
-          { id: 'why', label: '왜 이 파트인가' },
-          { id: 'focus', label: '가장 파고든 것' },
+          { id: 'overview', label: '개요 · 역할' },
           { id: 'architecture', label: '인증 아키텍처' },
-          { id: 'whytech', label: '기술 선택' },
           { id: 'decisions', label: '결정 로그' },
           { id: 'troubleshooting', label: '트러블슈팅' },
-          { id: 'email', label: '이메일 인증' },
-          { id: 'admin', label: '회원 관리' },
-          { id: 'common', label: '공통 모듈·협업' },
+          { id: 'etc', label: '그 외 구현' },
           { id: 'retrospect', label: '성과와 배운 점' },
         ]}
       />
 
-      <Section id="overview" no="01" title="어떤 프로젝트인가">
+      <Section id="overview" no="01" title="개요 · 역할">
         <p className="max-w-3xl leading-relaxed text-slate-700">
           흩어진 유기동물 정보와 입양 사이에 <b>'임시보호'라는 중간 단계</b>를 두는 커뮤니티
           플랫폼입니다.
@@ -262,14 +256,12 @@ export default function Ddasoom() {
             imgClassName="h-72 object-cover object-top"
           />
         </div>
-      </Section>
 
-      <Section
-        id="role"
-        no="02"
-        title="팀에서 나의 자리"
-        subtitle="도메인 단위로 나눠 맡았고, 저는 팀장으로서 Security 체계와 공통 모듈 및 컨벤션을 고민하고 설계하였습니다."
-      >
+        <h3 className="mb-3 mt-10 font-bold text-ink">팀에서 나의 자리</h3>
+        <p className="mb-4 max-w-3xl text-base text-slate-600">
+          도메인 단위로 나눠 맡았습니다. Spring Security 기반 인증/인가를 직접 설계해 보고 싶어
+          회원 · 보안 · 공통모듈을 맡았습니다.
+        </p>
         <RoleSplit
           roles={[
             {
@@ -286,31 +278,7 @@ export default function Ddasoom() {
         />
       </Section>
 
-      <Section
-        id="why"
-        no="03"
-        title="왜 이 파트를 맡았나"
-        subtitle="Spring Security 기반 인증/인가를 직접 구현해 보고 싶었습니다."
-      >
-        <p className="max-w-3xl leading-relaxed text-slate-700">
-          Spring Security를 설계한 것은 이번이 처음입니다. 이전 프로젝트의 인증 구현을
-          공부하며 처음부터 구현하고자 하였으나 <br/> 미처 고려하지 못했던 <b>문제들이</b> 드러났고,
-          이를 고민하며 고쳐나간 과정을 아래에 정리하였습니다.
-        </p>
-      </Section>
-
-      <Section id="focus" no="04" title="가장 파고든 것">
-        <Highlight
-          lines={['JWT와 Spring Security의 구조 및 구현 방식에 대한 공부']}
-          gains={[
-            '로그인 버튼을 누른 뒤 일어나는 JWT 흐름(토큰 발급 → 검증 → 재발급 → 로그아웃)을 공부할 수 있었던 것',
-            "'여러 탭이 동시에 요청하면?' 같은 예외 상황을 먼저 상상하는 습관",
-            '팀원과의 회의 내용을 선택지·근거와 함께 노션, 코드리뷰 등으로 문서화하는 협업 경험',
-          ]}
-        />
-      </Section>
-
-      <Section id="architecture" no="05" title="인증 아키텍처">
+      <Section id="architecture" no="02" title="인증 아키텍처">
         <TokenTable />
         <div className="mt-6">
           <h3 className="mb-3 font-bold text-ink">요청당 인증 파이프라인</h3>
@@ -326,7 +294,7 @@ export default function Ddasoom() {
               <li>
                 · 인증/인가 정책 여부에 따라 {' '}
                 <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">
-                  PUBLIC_URI / USER_URI
+                  PUBLIC_URIS / PUBLIC_GET_URIS / USER_URIS
                 </code>
                 에 나누어 작성.
               </li>
@@ -335,14 +303,14 @@ export default function Ddasoom() {
                 은 ADMIN 자동 잠금. 경로 규칙만 지키면 인가 시스템 활용 가능
               </li>
               <li>
-                · 소셜 가입 직후는 GUEST 권한 부여. 추가 정보 입력 API 및 PUBLIC_URI만 허용하고, 완료 후 USER 권한으로 승급
+                · 소셜 가입 직후는 GUEST 권한 부여. 추가 정보 입력 API 및 공개 경로만 허용하고, 완료 후 USER 권한으로 승급
               </li>
               <li>
                 · 미분류 경로는{' '}
                 <code className="rounded bg-slate-200/60 px-1.5 py-0.5 text-sm">
                   anyRequest().authenticated()
                 </code>
-                를 거치므로 , '등록을 깜빡한 경로' 역시 잠금 처리
+                를 거치므로, '등록을 깜빡한 경로' 역시 잠금 처리
               </li>
             </ul>
           </Expand>
@@ -350,44 +318,8 @@ export default function Ddasoom() {
       </Section>
 
       <Section
-        id="whytech"
-        no="06"
-        title="왜 이 기술이었나"
-        subtitle="아키텍처에 쓰인 기술들을, 도입한 이유와 써보며 배운 것으로 정리했습니다."
-      >
-        <WhyTech
-          items={[
-            {
-              tech: 'JWT (세션 대신)',
-              why: <>서버 세션 없이 인증 상태 유지, Spring Security 필터 체인을 직접 구성</>,
-              learned: (
-                <>
-                  발급보다 무효화가 어려움 — jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 설계{' '}
-                  <a href="#decisions" className="font-semibold text-accent hover:underline">
-                    → 결정 01 · 03
-                  </a>
-                </>
-              ),
-            },
-            {
-              tech: 'Redis',
-              why: <>RT · 이메일 인증 코드 등 TTL이 필요한 값 보관</>,
-              learned: <>만료 정리 작업이 불필요한 대신, 요청당 조회 1회 → 2회를 감수</>,
-            },
-            {
-              tech: 'QueryDSL',
-              why: <>관리자 회원 검색의 키워드 · 권한 · 상태 조건 조합을 자바 코드로 조립</>,
-              learned: (
-                <>조건 미부착으로 '미지정 = 전체'를 처리, 정렬 같은 SQL 표현은 CASE로 명시</>
-              ),
-            },
-          ]}
-        />
-      </Section>
-
-      <Section
         id="decisions"
-        no="07"
+        no="03"
         title="설계 결정 로그"
         subtitle="팀 Notion의 트레이드오프 문서에서 옮긴, 실제 결정 과정의 기록입니다."
       >
@@ -419,57 +351,17 @@ export default function Ddasoom() {
               <p>
                 한 탭 안에서 여러 API가 동시에 401을 받는 경우를 위해 프론트에는 Single-flight
                 패턴(진행 중인 재발급 Promise를 공유)을 적용. 
-                <br/>reissue 요청은 인터셉터가 없는 별도 axios 인스턴스로 분리하여 재발급 무한 루프 가능성 차단.
+                <br/>reissue 요청은 인터셉터가 붙지 않은 기본 axios로 호출하여 재발급 무한 루프 가능성 차단.
               </p>
             }
           />
 
           <Decision
             no={2}
-            title="RT 로테이션 (Reissue) 이 만드는 멀티탭 경합을 어떻게 풀 것인가"
-            context={
-              <>
-                여러 탭이 같은 구 RT로 동시에 재발급을 요청하면{' '}
-                <b>나머지 탭이 전부 로그아웃</b> 되는 경합 발생. 
-              </>
-            }
-            options={[
-              {
-                name: 'A. 로테이션만 적용',
-                note: '단순하지만 멀티탭 로그아웃 버그를 그대로 안게 됨',
-              },
-              {
-                name: (
-                  <>
-                    B. 로테이션 + <b>Grace Period</b>
-                  </>
-                ),
-                note: '회전 직후의 구 RT를 잠시 Redis에 같이 보관하여 요청 처리',
-                chosen: true,
-              },
-              {
-                name: 'C. 로테이션 + 재사용 탐지',
-                note: '보안은 강하지만 Grace Period 개념과 정면으로 상충',
-              },
-            ]}
-            decision={
-              <>
-                <b>방식 B 채택 </b> 
-                <br/>구 RT를 별도 키인 Grace Period(TTL 30초)로 보관해 뒤늦은 탭은 새 AT만 발급. 
-                <br/>무한 루프 방지를 위하여 <b>재회전 금지</b>.
-              </>
-            }
-            tradeoff={
-              <>재사용 탐지를 넣지 못하므로, RT 탈취 상황에 대한 대비책 고려</>
-            }
-          />
-
-          <Decision
-            no={3}
             title="관리자가 제재한 회원을 '즉시' 차단할 수 있는가"
             context={
               <>
-                강제탈퇴해도 <b>기존에 발급한 AT는 최대 30분간 유효</b>. 관리자는 대상의 AT를 알 수 없어 블랙리스트 등록 불가능
+                탈퇴 · 제재 처리해도 <b>기존에 발급한 AT는 최대 30분간 유효</b>. 관리자는 대상의 AT를 알 수 없어 블랙리스트 등록 불가능
               </>
             }
             options={[
@@ -497,13 +389,13 @@ export default function Ddasoom() {
               </>
             }
             tradeoff={
-              <>요청당 Redis 조회 1회 → 2회. 적용 범위는 강제탈퇴·제재로 최소화.</>
+              <>유효한 AT 요청당 Redis 조회 최대 1회 → 2회. 마커 등록은 탈퇴(자진 · 강제) · 제재 시로 한정.</>
             }
           />
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="08" title="트러블슈팅">
+      <Section id="troubleshooting" no="04" title="트러블슈팅">
         <div className="space-y-8">
 
           <TroubleCard
@@ -540,171 +432,94 @@ export default function Ddasoom() {
         </div>
       </Section>
 
-      <Section id="email" no="09" title="이메일 인증">
-        <p className="max-w-3xl leading-relaxed text-slate-700">
-          인증 메일 발송은 비용이 드는 외부 I/O이므로, 남용을 순서대로 걸러내는 3단 방어를
-          두었습니다.
-        </p>
-        <ol className="mt-5 max-w-3xl space-y-3">
-          {[
-            { step: '1차 · IP 제한', desc: '동일 IP 시간당 10회 초과 시 차단. 무차별 발송 봇 방어' },
-            { step: '2차 · 쿨다운', desc: '동일 이메일 60초 재발송 제한. 연타 방지' },
-            { step: '3차 · 시도 제한', desc: '검증 5회 초과 시 코드 즉시 폐기. 무차별 대입 방어' },
-          ].map((d, i) => (
-            <li key={d.step} className="flex gap-4 leading-relaxed">
-              <span className="shrink-0 text-sm font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <span className="font-bold text-ink">{d.step}</span>
-                <span className="ml-2 text-slate-600">{d.desc}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 max-w-3xl text-base text-slate-600">
-          인증 코드는 Random 6자리, Redis에 TTL 3분으로 저장.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Figure
-            src="/images/ddasoom/signup-email.png"
-            alt="회원가입 이메일 인증 메일"
-            caption="실제 발송되는 인증 메일 · 6자리 코드, 3분 유효"
-          />
-          <Figure
-            src="/images/ddasoom/signup.png"
-            alt="회원가입 화면"
-            caption="회원가입 · 인증 완료 후 30분 내 가입, 비밀번호 정책·닉네임 중복 검증"
-          />
-        </div>
-      </Section>
-
-      <Section id="admin" no="10" title="회원 관리">
+      <Section id="etc" no="05" title="그 외 구현">
         <Bullets
           items={[
             <>
-              <b>계정 생명주기 설계</b>: 탈퇴는 데이터를 지우지 않고 상태만 바꾸는 소프트
-              삭제(soft delete) — 동일 이메일 재가입은 차단하되 관리자 복구는 허용
+              <b>이메일 인증 남용 방어</b>: IP 시간당 10회 · 동일 이메일 60초 재발송 제한 · 검증 5회
+              실패 시 코드 폐기. 코드는 랜덤 6자리, Redis TTL 3분
             </>,
             <>
-              <b>마이페이지</b>: 정보 수정, 비밀번호 변경(변경 시 <b> 재 로그인 요청</b>), 로그인
-              이력 조회, 자진 탈퇴
+              <b>계정 생명주기</b>: 탈퇴는 소프트 삭제 — 동일 이메일 재가입은 차단, 관리자 복구는
+              허용. 탈퇴(자진 · 강제) · 제재 시 강제 로그아웃 마커(결정 02)를 등록해 즉시 차단, 복구 시 해제
             </>,
             <>
-              <b>QueryDSL 동적 검색</b>: 키워드/권한/상태 필터를 조건 조합으로 처리. 상태
-              (활성/숨김/탈퇴)처럼 컬럼에 없는 정렬 기준은 쿼리 안에서 CASE로 계산
+              <b>관리자 회원 검색</b>: QueryDSL로 키워드 · 권한 · 상태 조건 조합. 컬럼에 없는 상태
+              정렬은 CASE로 계산
             </>,
             <>
-              <b>제재·강제 탈퇴·복구</b>: 강제 탈퇴 마커(결정 03)와 연동해 즉시 차단, 복구 시
-              해제
+              <b>공통 규격</b>: <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">ApiResponse&lt;T&gt;</code>{' '}
+              단일 응답 규격, GlobalExceptionHandler + 도메인별 ErrorCode enum(코드 · 메시지 · HTTP 상태)
             </>,
             <>
-              <b>관리자 계정 보호</b>: ADMIN은 제재 대상에서 제외, 가입 API로 생성 불가
-            </>,
-          ]}
-        />
-        <div className="mt-6 space-y-4">
-          <Figure
-            src="/images/ddasoom/admin-users.png"
-            alt="관리자 유저 관리 목록"
-            caption="유저 관리 목록 · 키워드·권한·상태 필터와 정렬, 활성/숨김/탈퇴 상태 관리"
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Figure
-              src="/images/ddasoom/admin-user-detail.png"
-              alt="회원 상세 (활성 회원)"
-              caption="회원 상세(활성) · 소셜 연동·로그인 이력·신고 내역 확인, 회원 숨김/강제 탈퇴"
-            />
-            <Figure
-              src="/images/ddasoom/admin-user-restore.png"
-              alt="회원 상세 (탈퇴 회원)"
-              caption="회원 상세(탈퇴) · 계정 복구 시 강제 로그아웃 마커 해제와 함께 정상화"
-            />
-          </div>
-        </div>
-      </Section>
-
-      <Section id="common" no="11" title="공통 모듈과 협업 방식">
-        <Bullets
-          items={[
-            <>
-              <b>ApiResponse</b>: 전 API 응답을 <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">ApiResponse&lt;T&gt;</code> 단일 규격으로 통일 — 프론트가 성공/실패
-              분기를 한 곳에서 처리
+              <b>PageableSanitizer</b>: 허용된 정렬 기준만 통과, size 최대값 제한. 13개 컨트롤러에
+              일괄 적용
             </>,
             <>
-              <b>GlobalExceptionHandler + 도메인별 ErrorCode</b>: 예외를 단일 지점에서 처리하고,
-              도메인별 ErrorCode enum이 코드 · 메시지 · HTTP 상태를 함께 관리
-            </>,
-            <>
-              <b>PageableSanitizer</b>: size , sort 등이 비정상적인 요청이 들어올 수 있음을 고려.
-              허용된 정렬 기준만 통과시키고 size에 최대값을 두는 유틸을 만들어 13개 컨트롤러에 일괄
-              적용
-            </>,
-            <>
-              <b>문서 우선 협업</b>: 1. 코드·DB·보안 컨벤션을 문서로 관리하여 프로젝트 안에서 공유.
-              2. 트러블슈팅/트레이드오프/작업요청/라이브러리 도입 가이드 등을 Notion에 축적하여 문서화된 작업 지향
+              <b>문서 우선 협업</b>: 코드 · DB · 보안 컨벤션을 저장소 docs에서 관리, 트러블슈팅 ·
+              트레이드오프는 Notion에 기록
             </>,
           ]}
         />
 
         {/* 직접 작성한 설계 문서 3종 */}
-        <div className="mt-8">
-          <h3 className="mb-3 font-bold text-ink">컨벤션 설계 문서</h3>
-          <p className="mb-4 text-base text-slate-600">
-            백엔드 프로젝트의 docs 폴더 안에 들어 있는 컨벤션 및 가이드라인 문서입니다.
-          </p>
-          <div className="grid gap-3 lg:grid-cols-3">
-            {[
-              {
-                name: 'SECURITY-FLOW.md',
-                href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/SECURITY-FLOW_V3.md',
-                desc: '인증/인가 전체 흐름과 모든 설계 결정의 근거를 기록',
-              },
-              {
-                name: 'BACKEND_CODE_CONVENTIONS.md',
-                href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/BACKEND_CODE_CONVENTIONS.md',
-                desc: '패키지 구조와 네이밍·응답 규격. 규칙 변경은 문서 PR로만',
-              },
-              {
-                name: 'DB_CONVENTIONS.md',
-                href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/DB_CONVENTIONS.md',
-                desc: '테이블·컬럼 네이밍과 FK 규칙 등 설계·리뷰 공통 기준',
-              },
-            ].map((d) => (
-              <a
-                key={d.name}
-                href={d.href}
-                target="_blank"
-                rel="noreferrer"
-                className="block rounded-md border border-slate-200 p-5 transition-all hover:border-accent-line hover:shadow-md"
-              >
-                <div className="flex items-center gap-2 font-semibold text-ink">
-                  <span className="text-accent">📄</span>
-                  <span className="break-all">{d.name}</span>
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">{d.desc}</p>
-                <div className="mt-3 text-xs font-semibold text-accent">GitHub에서 보기 ↗</div>
-              </a>
-            ))}
-          </div>
+        <div className="mt-8 grid gap-3 lg:grid-cols-3">
+          {[
+            {
+              name: 'SECURITY-FLOW.md',
+              href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/SECURITY-FLOW_V3.md',
+              desc: '인증/인가 전체 흐름과 설계 결정의 근거',
+            },
+            {
+              name: 'BACKEND_CODE_CONVENTIONS.md',
+              href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/BACKEND_CODE_CONVENTIONS.md',
+              desc: '패키지 구조와 네이밍 · 응답 규격',
+            },
+            {
+              name: 'DB_CONVENTIONS.md',
+              href: 'https://github.com/SeSac-3/ddasoom-backend/blob/main/docs/DB_CONVENTIONS.md',
+              desc: '테이블 · 컬럼 네이밍과 FK 규칙',
+            },
+          ].map((d) => (
+            <a
+              key={d.name}
+              href={d.href}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-md border border-slate-200 p-5 transition-all hover:border-accent-line hover:shadow-md"
+            >
+              <div className="flex items-center gap-2 font-semibold text-ink">
+                <span className="text-accent">📄</span>
+                <span className="break-all">{d.name}</span>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{d.desc}</p>
+              <div className="mt-3 text-xs font-semibold text-accent">GitHub에서 보기 ↗</div>
+            </a>
+          ))}
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Figure src="/images/ddasoom/erd.png" alt="따숨 ERD" caption="팀 전체 ERD · 회원·소셜회원·로그인 이력 테이블 설계 담당" />
-          <Figure src="/images/ddasoom/swagger.png" alt="Swagger API 문서" caption="Swagger 기반 API 문서 · 팀 협업 규격" />
+
+        <div className="mt-6 space-y-4">
           <Figure
-            src="/images/ddasoom/code-review.png"
-            alt="코드 리뷰 코멘트"
-            caption="공공 API 데이터 검증 로직에 남긴 코드 리뷰 · 경계 케이스 지적과 합의"
-            className="sm:col-span-2 sm:mx-auto sm:max-w-2xl"
+            src="/images/ddasoom/admin-users.png"
+            alt="관리자 유저 관리 목록"
+            caption="유저 관리 목록 · 키워드 · 권한 · 상태 필터와 정렬"
           />
-          <Figure
-            src="/images/ddasoom/notion-troubleshooting.png"
-            alt="Notion 트러블슈팅·트레이드오프 문서"
-            caption="트러블슈팅 & 트레이드오프 기록 · 이 페이지의 결정 로그가 여기서 나왔습니다"
-            className="sm:col-span-2"
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Figure
+              src="/images/ddasoom/code-review.png"
+              alt="코드 리뷰 코멘트"
+              caption="공공 API 데이터 검증 로직에 남긴 코드 리뷰 · 경계 케이스 지적과 합의"
+            />
+            <Figure
+              src="/images/ddasoom/notion-troubleshooting.png"
+              alt="Notion 트러블슈팅·트레이드오프 문서"
+              caption="트러블슈팅 & 트레이드오프 기록 · 결정 로그의 출처"
+            />
+          </div>
         </div>
       </Section>
 
-      <Section id="retrospect" no="12" title="성과와 배운 점">
+      <Section id="retrospect" no="06" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
@@ -716,7 +531,7 @@ export default function Ddasoom() {
             </>,
             <>
               <b>무효화 설계</b> — jti 블랙리스트 + 회원 단위 강제 로그아웃 마커, 요청당 Redis 조회
-              2회 감수
+              최대 2회 감수
             </>,
             <>
               <b>선택지 · 근거를 함께 남기는 결정 로그 문서화</b> (Notion → docs/SECURITY-FLOW)
@@ -724,8 +539,8 @@ export default function Ddasoom() {
           ]}
           questions={[
             <>
-              Spring Security도 라이브러리를 도입하여 직접 구현하지 않는 방식에 대한 추가 학습
-              필요
+              인증을 직접 구현하는 대신 Spring Authorization Server · Keycloak 같은 인증 서버에
+              맡기는 방식과의 비교 학습 필요
             </>,
           ]}
         />
