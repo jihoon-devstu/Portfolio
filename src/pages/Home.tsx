@@ -95,7 +95,7 @@ const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string
     desc: [
       '입찰 조회·검증·갱신을 Redis Lua Script 단일 원자 연산으로 처리',
       'Redis 예외 시 DB 비관적 락으로 전환, 재동기화 성공 시 복귀',
-      '부하테스트로 동시성 버그 4개 발견 → 수정 → 재측정 (동시 주문 500 오류 71 → 0)',
+      'k6 부하테스트로 동시성 버그 4개를 찾아 재측정까지 확인, 채팅 데드락 · 스레드 풀 설정은 직접 수정 (왕복 p95 1.95s → 87ms)',
     ],
     tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'k6'],
     from: 'Fantry · 곳간에서 경험',
@@ -140,7 +140,7 @@ const STACKS: { group: string; items: string[] }[] = [
   },
   {
     group: 'Tools · 협업',
-    items: ['Git · GitHub', 'Swagger', 'Notion', 'Slack', 'IntelliJ', 'VS Code', 'Eclipse'],
+    items: ['Git · GitHub', 'Claude Code', 'Swagger', 'Notion', 'Slack', 'IntelliJ', 'VS Code', 'Eclipse'],
   },
 ]
 
@@ -151,7 +151,7 @@ const PROJECTS = [
     name: '곳간 (GOTGAN)',
     summary: 'MSA 멀티 스토어 오픈마켓 — AWS 인프라 · 결제 · 정산 · 관리자 · 채팅',
     highlight:
-      '서비스 10개를 Terraform 으로 만든 EKS 에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (동시 주문 500 오류 71 → 0)',
+      '서비스 10개를 Terraform으로 만든 EKS에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (채팅 왕복 p95 1.95s → 87ms)',
     tags: ['AWS EKS · Terraform', 'MSA', 'SNS · SQS 아웃박스', 'k6 부하테스트'],
     badge: '대표 프로젝트',
   },
@@ -212,7 +212,7 @@ export default function Home() {
             끊임없이 생각하는 개발자, 구지훈입니다.
           </h1>
           <p className="mt-5 max-w-2xl leading-relaxed text-slate-600">
-            AI 가 코드를 쓰는 시간이 늘수록 구조를 이해하고 설계하는 능력이 중요하다고 봅니다.{' '}
+            AI가 코드를 쓰는 시간이 늘수록 구조를 이해하고 설계하는 능력이 중요하다고 봅니다.{' '}
             <br className="hidden sm:block" />
             AI 활용 능력과 설계 능력을 함께 키우는 백엔드 개발자를 목표로 합니다.
           </p>

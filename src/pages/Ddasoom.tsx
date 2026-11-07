@@ -539,8 +539,8 @@ export default function Ddasoom() {
           ]}
           questions={[
             <>
-              인증을 직접 구현하는 대신 Spring Authorization Server · Keycloak 같은 인증 서버에
-              맡기는 방식과의 비교 학습 필요
+              인증을 직접 구현하는 대신 Keycloak 같은 인증 서버에 맡기는 방식과의 비교가 남음 →
+              이후 곳간에서 Keycloak + gateway 구조를 팀 프로젝트로 경험
             </>,
           ]}
         />

@@ -95,7 +95,6 @@ export default function Fantry() {
           'Vue 3 + Vite',
           'Nginx',
           'GitHub Actions',
-          'Loki & Grafana',
           'Flyway',
         ]}
         links={[

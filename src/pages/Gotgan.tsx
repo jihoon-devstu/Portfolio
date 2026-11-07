@@ -31,7 +31,7 @@ function ArchDiagram() {
       <div className="mx-auto max-w-3xl space-y-2">
         <div className={box}>
           <div className="font-semibold text-ink">브라우저 → Vercel(React) → Route 53 · NLB(443)</div>
-          <div className="mt-1 text-sm text-slate-500">도메인 · 인증서 · 고정 IP 는 상시 유지, 클러스터만 매일 재생성</div>
+          <div className="mt-1 text-sm text-slate-500">도메인 · 인증서 · 고정 IP는 상시 유지, 클러스터만 매일 재생성</div>
         </div>
         {arrow}
         <div className={box}>
@@ -122,10 +122,10 @@ export default function Gotgan() {
         description={
           <>
             작은 가게가 입점해 상품을 팔고 주간 정산을 받기까지의 흐름을 Spring Boot 마이크로서비스
-            10개로 만들어 AWS EKS 에 배포한 최종 프로젝트입니다.
+            10개로 만들어 AWS EKS에 배포한 최종 프로젝트입니다.
             <br />
             <b>AWS 인프라(Terraform)와 결제 · 정산 · 관리자 · 채팅 서비스를 담당</b>했고, 기능 완성
-            뒤에는 QA 와 부하테스트를 맡아 측정 → 수정 → 재측정을 진행했습니다.
+            뒤에는 QA와 부하테스트를 맡아 측정 → 수정 → 재측정을 진행했습니다.
           </>
         }
         meta={[
@@ -165,7 +165,7 @@ export default function Gotgan() {
           { id: 'design', label: '맡은 설계' },
           { id: 'loadtest', label: '부하테스트' },
           { id: 'troubleshooting', label: '트러블슈팅' },
-          { id: 'collab', label: 'AI 리뷰 · 협업' },
+          { id: 'collab', label: 'AI 활용 · 협업' },
           { id: 'retrospect', label: '성과와 배운 점' },
         ]}
       />
@@ -252,13 +252,13 @@ export default function Gotgan() {
               갱신(커밋)했고 팀원도 자기 영역을 직접 고침
             </>,
             <>
-              <b>목업 56개 화면</b>: 요구사항과 화면 구현의 기준. 프론트에 이식한 뒤 API 로 하나씩
+              <b>목업 56개 화면</b>: 요구사항과 화면 구현의 기준. 프론트에 이식한 뒤 API로 하나씩
               교체하고, 마지막에는 목업을 실제 화면 기준으로 다시 맞춤. 상표 · 초상권 문제가 있는
               이미지 75장은 교체
             </>,
             <>
               <b>AI 작업의 기준으로도 사용</b>: 가이드라인 · 컨벤션을 AI 작업 컨텍스트로 넣어 사람과
-              AI 가 같은 규칙을 따르게 함
+              AI가 같은 규칙을 따르게 함
             </>,
           ]}
         />
@@ -306,7 +306,7 @@ export default function Gotgan() {
         id="architecture"
         no="04"
         title="전체 구성"
-        subtitle="요청 한 건이 지나가는 길입니다. 인프라 전체는 Terraform 코드로 매일 08:00 에 만들고 22:00 에 지웁니다."
+        subtitle="요청 한 건이 지나가는 길입니다. 인프라 전체는 Terraform 코드로 매일 08:00에 만들고 22:00에 지웁니다."
       >
         <ArchDiagram />
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -328,7 +328,7 @@ export default function Gotgan() {
       <Section
         id="design"
         no="05"
-        title="내가 맡은 설계"
+        title="내가 맡은 부분의 설계"
         subtitle="무엇을 선택했고, 그 대가로 무엇을 감수했는지 정리했습니다."
       >
         <WhyTech
@@ -337,7 +337,7 @@ export default function Gotgan() {
               tech: 'Terraform · 매일 재생성',
               why: (
                 <>
-                  VPC · EKS · 노드 · SNS/SQS 를 코드로 만들고, EventBridge Scheduler 로 매일 08:00
+                  VPC · EKS · 노드 · SNS/SQS를 코드로 만들고, EventBridge Scheduler로 매일 08:00
                   생성 · 22:00 삭제. 개발 운영비 월 약 72만 → 45만 원
                 </>
               ),
@@ -358,7 +358,7 @@ export default function Gotgan() {
               ),
               learned: (
                 <>
-                  포트원 취소 API 에 멱등 키가 없음 → 결과를 모르면 포트원 조회로 대조하고 복구
+                  포트원 취소 API에 멱등 키가 없음 → 결과를 모르면 포트원 조회로 대조하고 복구
                   스케줄러가 마무리{' '}
                   <a href="#troubleshooting" className="font-semibold text-accent hover:underline">
                     → 트러블슈팅 01
@@ -370,8 +370,8 @@ export default function Gotgan() {
               tech: '이벤트 (아웃박스 · 멱등)',
               why: (
                 <>
-                  업무 데이터와 이벤트를 같은 트랜잭션에 기록(아웃박스), 받는 쪽은 eventId 로 중복
-                  처리 방지
+                  업무 데이터와 이벤트를 같은 트랜잭션에 기록(아웃박스), 받는 쪽은 eventId로 중복
+                  처리 방지 (정산 서비스에 적용)
                 </>
               ),
               learned: (
@@ -386,7 +386,7 @@ export default function Gotgan() {
               why: (
                 <>
                   관리자 화면은 여러 서비스의 데이터를 한곳에 모아 봄 → 데이터를 복제하지 않고 내부
-                  API 를 모아 보여 주는 서비스로 분리
+                  API를 모아 보여 주는 서비스로 분리
                 </>
               ),
               learned: (
@@ -398,7 +398,7 @@ export default function Gotgan() {
               why: (
                 <>
                   알림 센터는 SSE, 1:1 채팅은 WebSocket(STOMP). 파드가 2개 이상이어도 전달되도록 Redis
-                  Pub/Sub 로 중계
+                  Pub/Sub로 중계
                 </>
               ),
               learned: (
@@ -430,6 +430,10 @@ export default function Gotgan() {
                 측정 결과로 값을 정함 — 힙 상한 75% → 33%, DB 연결 상한 300, 구매 경로 서비스 6개
                 레플리카 2 · 노드 분산 · PDB
               </>,
+              <>
+                한계 측정에서는 리뷰 서비스가 먼저 무너졌지만 오류는 리뷰 · 문의 API에서만 나고 쇼핑은
+                계속됨. 노드 하나를 비우는(drain) 시험은 로그인 복구에 약 5분이 걸려 남은 과제로 기록
+              </>,
             ]}
           />
         </div>
@@ -442,14 +446,14 @@ export default function Gotgan() {
             title='결제 취소 응답이 끊기면 "환불됐는데 결제 완료"로 영원히 남는다'
             problem={
               <>
-                포트원은 취소를 처리했는데 응답이 3초 안에 오지 않으면 payment 는 502, DB 는 결제 완료
+                포트원은 취소를 처리했는데 응답이 3초 안에 오지 않으면 payment는 502, DB는 결제 완료
                 그대로. 복구 스케줄러가 재시도하면 포트원은 "이미 취소됨"으로 거절 →{' '}
-                <b>502 가 영원히 반복</b>.
+                <b>502가 영원히 반복</b>.
               </>
             }
             cause={
               <>
-                포트원 취소 API 에 멱등 키가 없는데, 코드가 "외부 성공 → 내 DB 기록" 순서라 그 사이에
+                포트원 취소 API에 멱등 키가 없는데, 코드가 "외부 성공 → 내 DB 기록" 순서라 그 사이에
                 끊기면 기록 없는 취소가 생김. 재시도 때의 거절도 일반 실패로 처리.
               </>
             }
@@ -457,7 +461,7 @@ export default function Gotgan() {
               <>
                 <b>선기록(PENDING) → 포트원 호출 → 확정</b> 3단계로 변경. 결과를 모르면 포트원 결제
                 조회의 취소 내역과 대조, "이미 취소됨"은 실패가 아니라 대조 대상으로 처리. 끝까지 모르면
-                409 를 돌려주고 복구 스케줄러가 1분 주기로 마무리.
+                409를 돌려주고 복구 스케줄러가 1분 주기로 마무리.
               </>
             }
             result={
@@ -468,7 +472,7 @@ export default function Gotgan() {
             }
             detail={
               <p>
-                외부 결제 API 는 먼저 "멱등 키가 있는가"를 명세에서 확인하고, 없으면 부르기 전에 먼저
+                외부 결제 API는 먼저 "멱등 키가 있는가"를 명세에서 확인하고, 없으면 부르기 전에 먼저
                 기록해 끊겼을 때 무엇으로 복구할지 정해 둔다는 기준을 세웠습니다. 같은 점검에서 금액
                 불일치 자동 환불 누락 · 취소 요청 상태를 완료로 기록하던 문제도 함께 고쳤습니다.
               </p>
@@ -480,7 +484,7 @@ export default function Gotgan() {
             title='"커넥션 풀 포화"라는 내 판단은 틀렸다 — 채팅 왕복 3초'
             problem={
               <>
-                채팅 데드락을 고친 뒤 재측정하자 500 연결 왕복 p95 가 약 3초. 1차 측정 뒤에는 "chat 의
+                채팅 데드락을 고친 뒤 재측정하자 500 연결 왕복 p95가 약 3초. 1차 측정 뒤에는 "chat의
                 커넥션 풀 포화"라고 판단했었음.
               </>
             }
@@ -500,9 +504,9 @@ export default function Gotgan() {
             result={<>500 연결 왕복 p95 1.95s → <b>87ms</b>.</>}
             detail={
               <p>
-                채팅을 고치자 관리자 서비스가 받는 알림이 늘며 OOMKilled 가 드러났습니다. 힙 사용량은
-                상한보다 한참 아래였지만 힙 상한 75% 로 커밋이 늘어 힙 밖 메모리와 합쳐 limit 을 넘은
-                것이었고, 힙 상한을 33%(admin 41%)로 낮춰 재시작 0 을 확인했습니다. 병목 하나를 풀면
+                채팅을 고치자 관리자 서비스가 받는 알림이 늘며 OOMKilled가 드러났습니다. 힙 사용량은
+                상한보다 한참 아래였지만 힙 상한 75%로 커밋이 늘어 힙 밖 메모리와 합쳐 limit을 넘은
+                것이었고, 힙 상한을 33%(admin 41%)로 낮춰 재시작 0을 확인했습니다. 병목 하나를 풀면
                 다음 약점이 드러나므로 고친 뒤에는 반드시 다시 잽니다.
               </p>
             }
@@ -513,20 +517,20 @@ export default function Gotgan() {
             title="MSA 에서는 서비스 수 × 풀 크기가 곧 DB 연결 수"
             problem={
               <>
-                트래픽이 거의 없는 시간에도 MySQL 연결 104 / 151. 부하테스트 중에는 상한 151 에 도달해
-                새 연결 1건 거부. 파드 재시작이나 레플리카 추가 때 <b>새 파드가 DB 에 못 붙는 구조</b>.
+                트래픽이 거의 없는 시간에도 MySQL 연결 104 / 151. 부하테스트 중에는 상한 151에 도달해
+                새 연결 1건 거부. 파드 재시작이나 레플리카 추가 때 <b>새 파드가 DB에 못 붙는 구조</b>.
               </>
             }
             cause={
               <>
-                서비스 풀 합계 110 + 설정이 없던 Keycloak 의 기본 풀 최대 100. 서비스별로 DB 를 나눴지만
+                서비스 풀 합계 110 + 설정이 없던 Keycloak의 기본 풀 최대 100. 서비스별로 DB를 나눴지만
                 인스턴스는 하나라 연결 한도를 함께 씀.
               </>
             }
             solution={
               <>
                 바로 숫자를 올리지 않고 규칙부터 정함 — <b>상한 = Σ(풀 × 레플리카) + Keycloak + 여유
-                20</b>. Keycloak 풀 30 으로 제한, 상한 250 → 이중화 뒤 300.
+                20</b>. Keycloak 풀 30으로 제한, 상한 250 → 이중화 뒤 300.
               </>
             }
             result={<>부하 중 최대 171 / 300 · 거부 0.</>}
@@ -547,7 +551,7 @@ export default function Gotgan() {
                 자격 증명을 받을 수 있었음.
               </>
             }
-            solution={<>노드 메타데이터는 IMDSv2 만 · hop limit 1 로 막고, 파드의 AWS 권한은 IRSA 로만 부여.</>}
+            solution={<>노드 메타데이터는 IMDSv2만 · hop limit 1로 막고, 파드의 AWS 권한은 IRSA 로만 부여.</>}
             result={<>권한 없는 파드는 자격 증명 없음, IRSA 16개 조합(허용 · 거부) 전부 기대대로 동작.</>}
             detail={
               <p>
@@ -562,11 +566,16 @@ export default function Gotgan() {
       <Section
         id="collab"
         no="08"
-        title="AI 코드리뷰와 협업"
-        subtitle="AI 를 리뷰어로 쓰되, 기준을 먼저 정하고 결과는 근거를 직접 확인했습니다."
+        title="AI 활용과 협업"
+        subtitle="AI와 함께 구현하고 리뷰하되, 기준은 먼저 문서로 정하고 결과는 직접 검증했습니다."
       >
         <Bullets
           items={[
+            <>
+              <b>AI와 함께 구현</b>: 세 저장소에 첫날부터 AI 작업 규칙(CLAUDE.md — 추측 금지 · 최소
+              변경 · 검증 기준)을 두고, 가이드라인 · 컨벤션 · API 계약 문서를 컨텍스트로 넣어 구현. 결과는
+              테스트 · 품질 게이트 · 팀원 리뷰를 통과해야만 반영
+            </>,
             <>
               <b>하네스 기반 AI 전체 코드리뷰</b>: 리뷰 기준(백엔드 · 프론트 · 인프라 · MSA) · 범위 ·
               근거 규칙(파일:줄 · 심각도 · 담당)을 문서로 정하고 세 저장소를 영역 6개로 나눠 리뷰. 지적
@@ -574,7 +583,7 @@ export default function Gotgan() {
               뒤 수정
             </>,
             <>
-              <b>품질 게이트</b>: 모든 PR 은 팀원 승인 1명 + SonarQube 새 코드 커버리지 80% · 중복 3%
+              <b>품질 게이트</b>: 모든 PR은 팀원 승인 1명 + SonarQube 새 코드 커버리지 80% · 중복 3%
               통과 후 main 반영. 백엔드는 테스트 코드 줄 수가 운영 코드보다 많음
             </>,
             <>
@@ -593,7 +602,7 @@ export default function Gotgan() {
         <Retrospect
           gains={[
             <>
-              <b>클라우드 인프라를 코드로</b> — VPC 부터 EKS · 이벤트 · 서버리스까지 Terraform 으로
+              <b>클라우드 인프라를 코드로</b> — VPC 부터 EKS · 이벤트 · 서버리스까지 Terraform으로
               만들고 매일 재생성하며 운영
             </>,
             <>
@@ -605,16 +614,16 @@ export default function Gotgan() {
               아니라고 하면 판단을 버림
             </>,
             <>
-              <b>AI 를 쓰는 방식</b> — 기준을 문서로 정해 맡기고, 결과는 근거를 확인한 뒤 반영
+              <b>AI를 쓰는 방식</b> — 기준을 문서로 정해 맡기고, 결과는 근거를 확인한 뒤 반영
             </>,
           ]}
           questions={[
             <>
-              비용 때문에 MySQL · Redis · Keycloak · NAT 가 단일 구성. 실제 운영이라면 RDS Multi-AZ 와
+              비용 때문에 MySQL · Redis · Keycloak · NAT가 단일 구성. 실제 운영이라면 RDS Multi-AZ와
               이중화가 먼저 필요
             </>,
             <>
-              저장 데이터 암호화 · CDC 는 이번 범위에서 제외 — 다음 학습 과제
+              저장 데이터 암호화 · CDC는 이번 범위에서 제외 — 다음 학습 과제
             </>,
           ]}
         />
