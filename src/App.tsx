@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
+import Gotgan from './pages/Gotgan'
 import Fantry from './pages/Fantry'
 import Ddasoom from './pages/Ddasoom'
 import IntelliMarket from './pages/IntelliMarket'
@@ -27,6 +28,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Home />} />
+        <Route path="/gotgan" element={<Gotgan />} />
         <Route path="/fantry" element={<Fantry />} />
         <Route path="/ddasoom" element={<Ddasoom />} />
         <Route path="/intellimarket" element={<IntelliMarket />} />
