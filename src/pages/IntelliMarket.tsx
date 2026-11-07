@@ -95,7 +95,7 @@ export default function IntelliMarket() {
     <>
       <ProjectHeader
         name="intelliMarket"
-        tagline="Project 03 · 네이버 스마트스토어를 모티브로 한 쇼핑몰 플랫폼"
+        tagline="Project 04 · 네이버 스마트스토어를 모티브로 한 쇼핑몰 플랫폼"
         description={
           <>
             유저 쇼핑몰 / 판매자 스토어 / 스토어 어드민 / 마켓 어드민, 4개 역할로 구성된 JSP 기반

@@ -72,7 +72,7 @@ export default function Fantry() {
     <>
       <ProjectHeader
         name="Fantry"
-        tagline="Project 01 · 실시간 중고 경매 플랫폼"
+        tagline="Project 02 · 실시간 중고 경매 플랫폼"
         description={
           <>
             전문가 검수와 실시간 경매를 결합한 아이돌 굿즈 경매 플랫폼입니다.

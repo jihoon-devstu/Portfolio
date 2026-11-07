@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const NAV = [
   { to: '/', label: 'Home' },
+  { to: '/gotgan', label: '곳간' },
   { to: '/fantry', label: 'Fantry' },
   { to: '/ddasoom', label: 'Ddasoom' },
   { to: '/intellimarket', label: 'intelliMarket' },
@@ -28,17 +29,17 @@ export default function Layout() {
       <ScrollToTop />
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Link to="/" className="font-bold text-ink">
+          <Link to="/" className="shrink-0 font-bold text-ink">
             구지훈<span className="ml-2 hidden text-sm font-medium text-slate-400 sm:inline">Backend Developer</span>
           </Link>
-          <nav className="flex items-center gap-2 sm:gap-5">
+          <nav className="ml-3 flex min-w-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] sm:gap-5 [&::-webkit-scrollbar]:hidden">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
                 className={({ isActive }) =>
-                  'border-b-2 px-0.5 pb-0.5 text-xs font-medium transition-colors sm:px-1.5 sm:text-sm ' +
+                  'shrink-0 whitespace-nowrap border-b-2 px-0.5 pb-0.5 text-xs font-medium transition-colors sm:px-1.5 sm:text-sm ' +
                   (isActive
                     ? 'border-accent text-ink'
                     : 'border-transparent text-slate-500 hover:text-ink')

@@ -182,7 +182,7 @@ export default function Ddasoom() {
     <>
       <ProjectHeader
         name="Ddasoom (따숨)"
-        tagline="Project 02 · 유기동물 임시보호 커뮤니티 플랫폼"
+        tagline="Project 03 · 유기동물 임시보호 커뮤니티 플랫폼"
         description={
           <>
             유기동물 조회·임시보호·커뮤니티 플랫폼입니다. <b>팀장으로서 회원·보안·공통모듈을
