@@ -81,7 +81,7 @@ function CategoryDiagram() {
           스토어 ↔ 서브 카테고리 N:M 매핑
         </p>
       </div>
-      <ul className="mt-6 space-y-1.5 text-sm leading-relaxed text-slate-600">
+      <ul className="mt-6 space-y-1.5 text-[0.95rem] leading-relaxed text-slate-700">
         <li>- 상품은 <b>항상 최하단(sub)에만</b> 연결</li>
         <li>- 판매자별 카테고리는 <b>매핑 테이블(store_categories)</b>로 분리해 스토어마다 다른 트리</li>
         <li>- 계층이 3단계로 고정이라 쿼리가 단순하도록 <b>단계별 테이블로 분리</b></li>

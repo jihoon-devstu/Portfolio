@@ -95,7 +95,7 @@ export function Figure({
         />
       </a>
       {caption && (
-        <figcaption className="mt-2 text-center text-sm text-slate-500">{caption}</figcaption>
+        <figcaption className="mt-2 text-center text-[0.9rem] text-slate-500">{caption}</figcaption>
       )}
     </figure>
   )
@@ -306,7 +306,7 @@ export function Bullets({ items }: { items: ReactNode[] }) {
 /** 개조식 하위 항목 — 굵은 제목 아래 짧은 줄로 나눠 한눈에 읽히게 */
 export function Sub({ items, flush = false }: { items: ReactNode[]; flush?: boolean }) {
   return (
-    <ul className={(flush ? '' : 'mt-1.5 ') + 'space-y-1 text-[15px] leading-relaxed text-slate-600'}>
+    <ul className={(flush ? '' : 'mt-1.5 ') + 'space-y-1.5 text-[0.95rem] leading-relaxed text-slate-700'}>
       {items.map((item, i) => (
         <li key={i} className="flex gap-2">
           <span className="shrink-0 text-slate-400">-</span>

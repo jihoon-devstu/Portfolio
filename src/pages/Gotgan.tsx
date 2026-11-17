@@ -33,12 +33,12 @@ function ArchDiagram() {
       <div className="mx-auto max-w-3xl space-y-2">
         <div className={box}>
           <div className="font-semibold text-ink">브라우저 → Vercel(React) → Route 53, NLB(443)</div>
-          <div className="mt-1 text-sm text-slate-500">도메인, 인증서, 고정 IP는 상시 유지하고 클러스터만 매일 재생성</div>
+          <div className="mt-1 text-[0.9rem] text-slate-500">도메인, 인증서, 고정 IP는 상시 유지하고 클러스터만 매일 재생성</div>
         </div>
         {arrow}
         <div className={box}>
           <div className="font-semibold text-ink">gateway</div>
-          <div className="mt-1 text-sm text-slate-500">토큰 검증, 사용자 헤더 주입, 요청 제한, 타임아웃</div>
+          <div className="mt-1 text-[0.9rem] text-slate-500">토큰 검증, 사용자 헤더 주입, 요청 제한, 타임아웃</div>
         </div>
         {arrow}
         <div className="rounded-md border border-slate-300 bg-white p-4">
@@ -63,15 +63,15 @@ function ArchDiagram() {
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <div className={box}>
             <div className="font-semibold text-ink">데이터</div>
-            <div className="mt-1 text-sm text-slate-500">MySQL 1대에 서비스별 스키마, Redis</div>
+            <div className="mt-1 text-[0.9rem] text-slate-500">MySQL 1대에 서비스별 스키마, Redis</div>
           </div>
           <div className={box}>
             <div className="font-semibold text-ink">이벤트</div>
-            <div className="mt-1 text-sm text-slate-500">아웃박스 → SNS → SQS(+DLQ) → 서비스, Lambda</div>
+            <div className="mt-1 text-[0.9rem] text-slate-500">아웃박스 → SNS → SQS(+DLQ) → 서비스, Lambda</div>
           </div>
           <div className={box}>
             <div className="font-semibold text-ink">운영</div>
-            <div className="mt-1 text-sm text-slate-500">Terraform, Argo CD, Prometheus, Loki, Zipkin, Grafana</div>
+            <div className="mt-1 text-[0.9rem] text-slate-500">Terraform, Argo CD, Prometheus, Loki, Zipkin, Grafana</div>
           </div>
         </div>
       </div>
