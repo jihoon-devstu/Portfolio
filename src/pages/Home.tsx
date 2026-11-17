@@ -2,23 +2,30 @@ import { Link } from 'react-router-dom'
 import { CONTACT } from '../components/Layout'
 import { Bullets, Tag } from '../components/ui'
 
-/** 가치관 — 이전 포트폴리오에서 직접 쓴 문장을 기반으로 정리 */
+/** 나는 어떤 사람인가 — 자기소개서의 강점 세 가지를 압축 */
 const VALUES = [
   {
     key: 'Why',
-    title: '왜 이 기술인가',
-    body: "단순히 '동작하는 코드'가 아닌, 왜 이 기술이 필요한지와 대안은 무엇인지, 트레이드오프를 고민합니다.",
+    title: '왜를 먼저 묻습니다',
+    body: '마케팅 기획을 할 때도 타겟이 왜 반응할지부터 따졌습니다. 개발에서는 그 답을 측정과 근거로 확인할 수 있어 전향했고, 기술도 대안과 감수할 것을 비교한 뒤 고릅니다.',
   },
   {
-    key: 'How',
-    title: '어떻게 협업하는가',
-    body: "노션, 코드리뷰 코멘트 등 기록 습관을 들이고 컨벤션을 설계하는 등 '체계적인 의사소통'을 지향합니다.",
+    key: 'Lead',
+    title: '팀이 끝까지 완주하게',
+    body: '두 번의 팀 프로젝트에서 모두 팀장을 맡았습니다. 가이드 문서와 컨벤션으로 기준을 먼저 세우고, 팀원 모두가 맡은 기능을 끝까지 완성하도록 이끌었습니다.',
   },
   {
-    key: 'AI',
-    title: '어떻게 AI와 일하는가',
-    body: 'AI가 작성한 코드도 직접 읽고 검증한 뒤 책임집니다. 구조를 알아야 정확하게 지시할 수 있기에 도메인 · 서비스 · 인프라 구조를 이해하는 데 시간을 쓰고, 곳간에서는 리뷰 기준을 문서(하네스)로 정해 AI 코드리뷰에 적용했습니다.',
+    key: 'Record',
+    title: '기록을 다음 판단의 근거로',
+    body: '회사에서는 미팅 녹음을 회의록과 일정으로, 개발에서는 결정 로그와 트러블슈팅 90건으로 남겼습니다. 새 방식이 나오면 기록과 비교해 더 나은 쪽을 고릅니다.',
   },
+]
+
+/** 개발 회고에서 인용 — AI와 일할 때 스스로 던지는 질문 */
+const AI_QUESTIONS = [
+  'AI 없이도 이것을 구현할 수 있는가?',
+  'AI 없이 나는 어디까지 할 수 있는가?',
+  'AI가 주어진다면 어디까지 해낼 수 있는가?',
 ]
 
 /** 학력·경력 통합 타임라인 (시간순) */
@@ -151,7 +158,7 @@ const PROJECTS = [
     name: '곳간 (GOTGAN)',
     summary: 'MSA 멀티 스토어 오픈마켓 — AWS 인프라 · 결제 · 정산 · 관리자 · 채팅',
     highlight:
-      '서비스 10개를 Terraform으로 만든 EKS에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (채팅 왕복 p95 1.95s → 87ms)',
+      '서비스 10개를 Terraform으로 만든 EKS에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (채팅 왕복 p95 1.95s → 87ms), 관리자 화면에서 부하테스트와 실시간 모니터링',
     tags: ['AWS EKS · Terraform', 'MSA', 'SNS · SQS 아웃박스', 'k6 부하테스트'],
     badge: '대표 프로젝트',
   },
@@ -214,7 +221,7 @@ export default function Home() {
           <p className="mt-5 max-w-2xl leading-relaxed text-slate-600">
             AI가 코드를 쓰는 시간이 늘수록 구조를 이해하고 설계하는 능력이 중요하다고 봅니다.{' '}
             <br className="hidden sm:block" />
-            AI 활용 능력과 설계 능력을 함께 키우는 백엔드 개발자를 목표로 합니다.
+            AI 없이도, AI와 함께라도 제 몫을 해내는 백엔드 개발자를 목표로 합니다.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-7">
             <a
@@ -253,6 +260,24 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* 개발 회고 인용 — AI와 일하는 기준 */}
+        <figure className="mt-12 rounded-md bg-slate-50 px-6 py-7 sm:px-8">
+          <figcaption className="text-sm font-bold text-accent">개발 회고 중에서</figcaption>
+          <ol className="mt-4 space-y-2">
+            {AI_QUESTIONS.map((q, i) => (
+              <li key={q} className="flex gap-3 text-lg font-bold leading-snug text-ink">
+                <span className="shrink-0 text-accent">{i + 1}.</span>
+                {q}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
+            AI가 많은 일을 대신할수록 무엇을 만들지 설계하고, 결과가 맞는지 검증하고, 책임지는 사람이 더
+            필요하다고 생각합니다. 그래서 일할 때 이 세 가지를 스스로 묻고, AI에게는 하지 말아야 할 것과
+            참고할 문서, 지킬 기준을 먼저 정해 준 뒤 맡깁니다.
+          </p>
+        </figure>
 
         {/* 학력·경력 타임라인 */}
         <div className="mt-12">
