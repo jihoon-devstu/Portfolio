@@ -168,8 +168,7 @@ export default function Gotgan() {
           { id: 'ops', label: '운영 화면' },
           { id: 'troubleshooting', label: '트러블슈팅' },
           { id: 'collab', label: 'AI 활용 · 협업' },
-          { id: 'review', label: '개발 회고' },
-          { id: 'retrospect', label: '성과와 배운 점' },
+          { id: 'retrospect', label: '회고와 배운 점' },
         ]}
       />
 
@@ -576,39 +575,6 @@ export default function Gotgan() {
 
           <TroubleCard
             no={2}
-            title='"커넥션 풀 포화"라는 내 판단은 틀렸다 — 채팅 왕복 3초'
-            problem={
-              <>
-                채팅 데드락을 고친 뒤 재측정하자 500 연결 왕복 p95가 약 3초. 1차 측정 뒤에는 "chat의
-                커넥션 풀 포화"라고 판단했었음.
-              </>
-            }
-            cause={
-              <>
-                재측정에서 풀 대기는 0 → 판단을 버리고 스레드 덤프를 확인. 2스레드짜리 알림용 풀이
-                유일한 비동기 실행기 빈이라 Spring Boot 자동 설정이 <b>WebSocket 메시지 처리 채널에도
-                그 풀을 씌우고</b> 있었음.
-              </>
-            }
-            solution={
-              <>
-                알림 풀을 타입으로 자동 주입되지 않게(<code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">defaultCandidate = false</code>)
-                바꾸고 이름으로만 주입. 수정 전 실패 · 후 통과하는 재현 테스트 추가.
-              </>
-            }
-            result={<>500 연결 왕복 p95 1.95s → <b>87ms</b>.</>}
-            detail={
-              <p>
-                채팅을 고치자 관리자 서비스가 받는 알림이 늘며 OOMKilled가 드러났습니다. 힙 사용량은
-                상한보다 한참 아래였지만 힙 상한 75%로 커밋이 늘어 힙 밖 메모리와 합쳐 limit을 넘은
-                것이었고, 힙 상한을 33%(admin 41%)로 낮춰 재시작 0을 확인했습니다. 병목 하나를 풀면
-                다음 약점이 드러나므로 고친 뒤에는 반드시 다시 잽니다.
-              </p>
-            }
-          />
-
-          <TroubleCard
-            no={3}
             title="MSA 에서는 서비스 수 × 풀 크기가 곧 DB 연결 수"
             problem={
               <>
@@ -629,31 +595,6 @@ export default function Gotgan() {
               </>
             }
             result={<>부하 중 최대 171 / 300 · 거부 0.</>}
-          />
-
-          <TroubleCard
-            no={4}
-            title="권한을 주지 않은 파드가 노드의 AWS 권한을 쓰고 있었다"
-            problem={
-              <>
-                파드별 AWS 권한(IRSA)을 시험하다가, 권한을 주지 않은 파드에서도 노드의 IAM 역할이
-                조회됨. 서비스별 최소 권한 설계가 무력화된 상태.
-              </>
-            }
-            cause={
-              <>
-                EKS 모듈 기본값(IMDS hop limit 2) 때문에 컨테이너에서도 노드 메타데이터에 접근해 노드
-                자격 증명을 받을 수 있었음.
-              </>
-            }
-            solution={<>노드 메타데이터는 IMDSv2만 · hop limit 1로 막고, 파드의 AWS 권한은 IRSA 로만 부여.</>}
-            result={<>권한 없는 파드는 자격 증명 없음, IRSA 16개 조합(허용 · 거부) 전부 기대대로 동작.</>}
-            detail={
-              <p>
-                권한을 준 파드가 되는지보다, 권한을 주지 않은 파드가 무엇을 할 수 있는지를 먼저 시험해야
-                한다는 것을 배웠습니다.
-              </p>
-            }
           />
         </div>
       </Section>
@@ -708,52 +649,22 @@ export default function Gotgan() {
         <p className="mt-3 text-sm text-slate-500">원칙: 맡기되 방치하지 않기 (발표 「AI 활용 방식」)</p>
       </Section>
 
-      <Section id="review" no="10" title="개발 회고">
-        <blockquote className="border-l-4 border-accent pl-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
+      <Section id="retrospect" no="10" title="회고와 배운 점">
+        <blockquote className="mb-8 border-l-4 border-accent pl-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
           설계에 공들인 만큼 단단해졌고, 유연하게 바꾸는 힘도 그만큼 중요했던 6주
         </blockquote>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {[
-            {
-              head: '배운 것',
-              body: '인프라를 직접 설계하며 아키텍처의 기본기를 다졌습니다. 계층별 통신과 보안을 구현했고, DuckDNS의 HTTP 한계를 Route 53 도메인과 인증서로 풀었습니다.',
-            },
-            {
-              head: '어려웠던 것',
-              body: '"AI 없이도 이만큼의 결과물을 낼 수 있을까"라는 질문에 답하는 일, 그리고 AI를 더 잘 쓰는 방법을 찾는 일이었습니다.',
-            },
-            {
-              head: '다음 프로젝트에서',
-              body: '에이전트 기반 자동화와 품질 게이트처럼, LLM을 활용한 아키텍처를 직접 설계해 보고 싶습니다.',
-            },
-          ].map((c) => (
-            <div key={c.head} className="border-t-2 border-accent-line pt-4">
-              <h3 className="font-bold text-ink">{c.head}</h3>
-              <p className="mt-2 leading-relaxed text-slate-600">{c.body}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 max-w-3xl leading-relaxed text-slate-700">
-          팀장으로서 방향을 제시하면 팀원들은 맡은 일을 해내는 데서 그치지 않고 개선점을 먼저
-          제안했습니다. 일을 나눠 맡은 결과물이 아니라 각자의 색이 담긴 결과물을 함께 만들었고, 이런
-          협업은 AI가 대신 키워 줄 수 없는 역량이라고 느꼈습니다.
-        </p>
-      </Section>
-
-      <Section id="retrospect" no="11" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
-              <b>클라우드 인프라를 코드로</b> — VPC 부터 EKS · 이벤트 · 서버리스까지 Terraform으로
-              만들고 매일 재생성하며 운영
+              <b>클라우드 인프라를 코드로</b> — VPC부터 EKS, 서버리스까지 Terraform으로 만들고 매일
+              재생성하며 아키텍처 기본기를 다짐
             </>,
             <>
-              <b>분산 환경의 정합성</b> — 아웃박스 · 멱등 · 순서 규칙, 결과를 모르는 외부 호출은 먼저
+              <b>분산 환경의 정합성</b> — 아웃박스, 멱등, 순서 규칙. 결과를 모르는 외부 호출은 먼저
               기록하고 대조
             </>,
             <>
-              <b>측정 기반 판단</b> — 부하테스트 수치로 힙 · DB 연결 · 레플리카 값을 정하고, 재측정이
-              아니라고 하면 판단을 버림
+              <b>측정 기반 판단</b> — 부하테스트 수치로 설정값을 정하고, 재측정이 아니라고 하면 판단을 버림
             </>,
             <>
               <b>AI를 쓰는 방식</b> — 기준을 문서로 정해 맡기고, 결과는 근거를 확인한 뒤 반영
@@ -761,13 +672,23 @@ export default function Gotgan() {
           ]}
           questions={[
             <>
-              비용 때문에 MySQL · Redis · Keycloak · NAT가 단일 구성. 실제 운영이라면 RDS Multi-AZ와
-              이중화가 먼저 필요
+              에이전트 기반 자동화와 품질 게이트처럼, LLM을 활용한 아키텍처를 직접 설계해 보기
             </>,
             <>
-              저장 데이터 암호화 · CDC는 이번 범위에서 제외 — 다음 학습 과제
+              "AI 없이도 이만큼 해낼 수 있는가"에 답할 수 있도록 기초와 기본기를 더 다지기
             </>,
+            <>
+              비용 때문에 단일로 둔 MySQL, Redis, Keycloak, NAT를 운영 기준(RDS Multi-AZ, 이중화)으로
+              설계해 보기
+            </>,
+            <>이번 범위에서 뺀 저장 데이터 암호화와 CDC 적용</>,
           ]}
+          closing={
+            <>
+              팀원들이 맡은 일에서 그치지 않고 개선점을 먼저 제안해 준 덕분에, 일을 나눠 맡은 결과물이
+              아니라 각자의 색이 담긴 결과물을 함께 만들었습니다.
+            </>
+          }
         />
       </Section>
     </>
