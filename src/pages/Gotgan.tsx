@@ -2,6 +2,7 @@ import ProjectHeader from '../components/ProjectHeader'
 import TroubleCard from '../components/TroubleCard'
 import {
   Bullets,
+  Expand,
   Figure,
   Retrospect,
   RoleSplit,
@@ -124,13 +125,13 @@ export default function Gotgan() {
             작은 가게가 입점해 상품을 팔고 주간 정산을 받기까지의 흐름을 Spring Boot 마이크로서비스
             10개로 만들어 AWS EKS에 배포한 최종 프로젝트입니다.
             <br />
-            <b>AWS 인프라(Terraform)와 결제 · 정산 · 관리자 · 채팅 서비스를 담당</b>했고, 기능 완성
-            뒤에는 QA와 부하테스트를 맡아 측정 → 수정 → 재측정을 진행했습니다.
+            팀장으로 <b>AWS 인프라(Terraform)와 결제 · 정산 · 관리자 · 채팅 서비스를 담당</b>했고, 기능
+            완성 뒤에는 QA와 부하테스트, 관리자 화면의 실시간 모니터링까지 맡았습니다.
           </>
         }
         meta={[
           { label: '기간', value: '2026.10 – 2026.11 (6주)' },
-          { label: '팀 구성', value: '3명 (서비스 수직 분할)' },
+          { label: '팀 구성', value: '3명 (팀장 · 서비스 수직 분할)' },
           { label: '담당', value: 'AWS 인프라 · 결제 · 정산 · 관리자 · 채팅' },
           { label: '과정', value: 'SeSAC 영등포캠퍼스 8기 최종' },
         ]}
@@ -164,8 +165,10 @@ export default function Gotgan() {
           { id: 'architecture', label: '전체 구성' },
           { id: 'design', label: '맡은 설계' },
           { id: 'loadtest', label: '부하테스트' },
+          { id: 'ops', label: '운영 화면' },
           { id: 'troubleshooting', label: '트러블슈팅' },
           { id: 'collab', label: 'AI 활용 · 협업' },
+          { id: 'review', label: '개발 회고' },
           { id: 'retrospect', label: '성과와 배운 점' },
         ]}
       />
@@ -175,7 +178,7 @@ export default function Gotgan() {
           <ul className="space-y-2.5 text-base leading-relaxed text-slate-700">
             <li>
               <b>무엇을</b> · 구매 · 판매자센터 · 관리자 콘솔 · 1:1 채팅 · 실시간 알림 · 주간 정산까지
-              입점부터 정산까지 한 흐름
+              입점부터 정산까지 한 흐름 (필수 기능 85건 중 82건, 화면 54개)
             </li>
             <li>
               <b>목표 1</b> · 서비스 하나가 멈춰도 나머지 기능은 계속 동작 (장애 격리)
@@ -188,9 +191,9 @@ export default function Gotgan() {
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard value="10개" label="Spring Boot 서비스 + Lambda 5개" />
-          <StatCard value="417개" label="머지된 PR (내 PR 189개)" />
-          <StatCard value="1,902개" label="테스트 케이스" />
-          <StatCard value="62건" label="트러블슈팅 기록" />
+          <StatCard value="489개" label="머지된 PR (내 PR 241개)" />
+          <StatCard value="2,174개" label="테스트 케이스" />
+          <StatCard value="90건" label="트러블슈팅 기록" />
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Figure
@@ -219,7 +222,7 @@ export default function Gotgan() {
             {
               role: '인프라 · 결제 · 정산 · 관리자 · 채팅',
               detail:
-                'Terraform(VPC · EKS · ECR · SNS/SQS · S3 · DynamoDB · Route 53) · 클러스터 매일 생성/삭제 자동화 · payment · settlement · admin(조합 계층 · SSE 알림) · chat(WebSocket) · 메일 · 업로드 검사 Lambda · QA · 부하테스트',
+                'Terraform(VPC · EKS · ECR · SNS/SQS · S3 · DynamoDB · Route 53) · 클러스터 매일 생성/삭제 자동화 · payment · settlement · admin(조합 계층 · SSE 알림) · chat(WebSocket) · 메일 · 업로드 검사 Lambda · QA · 부하테스트 · 관리자 화면 부하테스트와 실시간 모니터링',
               mine: true,
             },
             {
@@ -434,12 +437,104 @@ export default function Gotgan() {
                 한계 측정에서는 리뷰 서비스가 먼저 무너졌지만 오류는 리뷰 · 문의 API에서만 나고 쇼핑은
                 계속됨. 노드 하나를 비우는(drain) 시험은 로그인 복구에 약 5분이 걸려 남은 과제로 기록
               </>,
+              <>
+                부하를 유지한 채 서비스 5개를 롤링 배포해 요청 40,758건 중 실패 0건 (팀 결과)
+              </>,
             ]}
           />
         </div>
       </Section>
 
-      <Section id="troubleshooting" no="07" title="트러블슈팅">
+      <Section
+        id="ops"
+        no="07"
+        title="운영 화면 — 부하테스트와 실시간 모니터링"
+        subtitle="관리자 시스템 상태 화면에서 부하를 걸고, 장애가 어디서 났는지 그래프와 호출 기록으로 바로 보이게 했습니다."
+      >
+        <Bullets
+          items={[
+            <>
+              <b>부하테스트 패널</b>: 버튼을 누르면 admin이 클러스터 안에 k6 Job을 만들어 게이트웨이로
+              부하를 보냄. k6 지표는 Prometheus로 보내고 화면이 1초마다 그래프로 그림. 실행 중에는
+              슬라이더로 동시 사용자 수를 바로 바꿈
+            </>,
+            <>
+              <b>실시간 모니터링</b>: 부하가 없어도 실제 트래픽 기준으로 항상 그림. 총 현황 · 서비스별
+              · 호출 · 장애 · 분석 5개 탭, 호출이나 장애 줄을 누르면 서비스 사이 구간별 소요 시간(트레이스)
+            </>,
+            <>
+              <b>이상 표시</b>: 에러율(5xx)이 0을 넘거나 응답이 평소보다 급등하면 그래프 배경을 빨갛게,
+              5xx 응답과 ERROR 로그는 목록에서 빨간 줄로 표시
+            </>,
+            <>
+              <b>장애 주입 API</b>: 서비스 파드 내리기, 레플리카 2인 구매 경로 서비스 5개를 1개씩 한 번에
+              내리기. 화면 배치와 장애 시연 영역은 박지연 님, API · 부하테스트 · 모니터링은 직접 구현
+            </>,
+          ]}
+        />
+        <Figure
+          src="/images/gotgan/system-loadtest.jpg"
+          alt="시스템 상태 화면 부하테스트 실행 중"
+          caption="부하테스트 실행 중 · 동시 사용자 50명 · 위는 부하 생성기 그래프, 아래는 실제 트래픽 모니터링"
+          className="mt-6"
+        />
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Figure
+            src="/images/gotgan/monitor-calls.jpg"
+            alt="실시간 모니터링 호출 탭과 서비스 필터"
+            caption="호출 탭 · 서비스 필터, 액추에이터 요청은 서버에서 제외"
+          />
+          <Figure
+            src="/images/gotgan/monitor-services.jpg"
+            alt="실시간 모니터링 서비스별 탭"
+            caption="서비스별 탭 · 서비스마다 초당 요청 · 평균 응답 · 에러율 · DB 연결"
+          />
+          <Figure
+            src="/images/gotgan/monitor-trace.jpg"
+            alt="호출 목록에서 연 트레이스"
+            caption="호출 → 트레이스 · gateway에서 product까지 구간별 소요 시간"
+          />
+          <Figure
+            src="/images/gotgan/monitor-analysis-status.jpg"
+            alt="분석 탭과 서비스 상태"
+            caption="분석 탭(느린 API · 상태 코드) 아래 서비스 상태 카드"
+          />
+          <Figure
+            src="/images/gotgan/admin-dashboard.jpg"
+            alt="관리자 운영 대시보드"
+            caption="관리자 운영 대시보드 · 여러 서비스의 내부 API를 모아 보여 주는 조합 계층"
+          />
+        </div>
+        <div className="mt-6">
+          <Expand summary="만들며 결정한 것">
+            <ul className="space-y-2">
+              <li>
+                · k6의 사용자 수 조절 API에는 인증이 없어, Service로 열지 않고 파드 IP로만 부르고
+                NetworkPolicy로 업무 티어 안에서만 허용
+              </li>
+              <li>
+                · 실행 중 사용자 수 변경 기능이 k6 v2에서 빠져 이미지를 1.8.3으로 고정
+              </li>
+              <li>
+                · k6 파드에는 서비스용 라벨을 붙이지 않아, 장애 시연 화면의 서비스 상태 집계에 섞이지 않게 함
+              </li>
+              <li>
+                · 에러율은 5xx만 셈. 4xx(없는 상품 등)는 업무상 정상 응답이라 평소 0%가 되게 함
+              </li>
+              <li>
+                · 그래프가 장애와 복구를 늦게 보여 주지 않도록 업무 서비스 지표 수집 간격을 15초에서 5초로
+              </li>
+              <li>
+                · 호출 목록에 Prometheus 수집 · 상태 확인 요청이 섞여 실제 요청이 묻히는 문제 → 액추에이터
+                요청은 서버에서 빼고, 서비스별로 골라 보는 필터 추가(화면에서만 거르면 한산한 서비스 요청이
+                40건 안에 안 보일 수 있어 서버에서 거름)
+              </li>
+            </ul>
+          </Expand>
+        </div>
+      </Section>
+
+      <Section id="troubleshooting" no="08" title="트러블슈팅">
         <div className="space-y-8">
           <TroubleCard
             no={1}
@@ -565,7 +660,7 @@ export default function Gotgan() {
 
       <Section
         id="collab"
-        no="08"
+        no="09"
         title="AI 활용과 협업"
         subtitle="AI와 함께 구현하고 리뷰하되, 기준은 먼저 문서로 정하고 결과는 직접 검증했습니다."
       >
@@ -591,14 +686,61 @@ export default function Gotgan() {
               지적 32건을 담당별로 나눠 31건 수정
             </>,
             <>
-              <b>기록</b>: 트러블슈팅 62건을 "증상 → 원인 → 해결 → 검증 → 교훈" 한 형식으로 남기고,
+              <b>기록</b>: 트러블슈팅 90건을 "증상 → 원인 → 해결 → 검증 → 교훈" 한 형식으로 남기고,
               공유 문서와 결정 요청 문서를 나눠 관리
             </>,
           ]}
         />
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-md border border-slate-200 p-5">
+            <p className="text-sm font-bold text-slate-500">AI가 관여한 곳</p>
+            <p className="mt-2 leading-relaxed text-slate-700">
+              설계 초안과 컨벤션 작성, 버전 관리, 문서와 회의록 정리, 코드 작성과 테스트, 작업 공유와 협업 요청
+            </p>
+          </div>
+          <div className="rounded-md border border-accent-line bg-accent-soft/40 p-5">
+            <p className="text-sm font-bold text-accent-deep">사람이 맡은 일</p>
+            <p className="mt-2 leading-relaxed text-slate-700">
+              서비스 아키텍처 설계, 업무 분장, 요구사항 정리, 서버 관리, 결과물 첨삭과 테스트 · 검증
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-sm text-slate-500">원칙: 맡기되 방치하지 않기 (발표 「AI 활용 방식」)</p>
       </Section>
 
-      <Section id="retrospect" no="09" title="성과와 배운 점">
+      <Section id="review" no="10" title="개발 회고">
+        <blockquote className="border-l-4 border-accent pl-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
+          설계에 공들인 만큼 단단해졌고, 유연하게 바꾸는 힘도 그만큼 중요했던 6주
+        </blockquote>
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          {[
+            {
+              head: '배운 것',
+              body: '인프라를 직접 설계하며 아키텍처의 기본기를 다졌습니다. 계층별 통신과 보안을 구현했고, DuckDNS의 HTTP 한계를 Route 53 도메인과 인증서로 풀었습니다.',
+            },
+            {
+              head: '어려웠던 것',
+              body: '"AI 없이도 이만큼의 결과물을 낼 수 있을까"라는 질문에 답하는 일, 그리고 AI를 더 잘 쓰는 방법을 찾는 일이었습니다.',
+            },
+            {
+              head: '다음 프로젝트에서',
+              body: '에이전트 기반 자동화와 품질 게이트처럼, LLM을 활용한 아키텍처를 직접 설계해 보고 싶습니다.',
+            },
+          ].map((c) => (
+            <div key={c.head} className="border-t-2 border-accent-line pt-4">
+              <h3 className="font-bold text-ink">{c.head}</h3>
+              <p className="mt-2 leading-relaxed text-slate-600">{c.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 max-w-3xl leading-relaxed text-slate-700">
+          팀장으로서 방향을 제시하면 팀원들은 맡은 일을 해내는 데서 그치지 않고 개선점을 먼저
+          제안했습니다. 일을 나눠 맡은 결과물이 아니라 각자의 색이 담긴 결과물을 함께 만들었고, 이런
+          협업은 AI가 대신 키워 줄 수 없는 역량이라고 느꼈습니다.
+        </p>
+      </Section>
+
+      <Section id="retrospect" no="11" title="성과와 배운 점">
         <Retrospect
           gains={[
             <>
