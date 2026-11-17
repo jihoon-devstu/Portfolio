@@ -59,7 +59,7 @@ export default function Layout() {
       <footer className="mt-16 border-t border-slate-200 bg-slate-50">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:justify-between sm:px-6">
           <p>
-            © 2026 Koo Ji Hoon (React 19 + Vite) ·{' '}
+            © 2026 Koo Ji Hoon (React 19 + Vite) |{' '}
             <a
               href="https://github.com/jihoon-devstu/Portfolio"
               target="_blank"

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/** 페이지 내 대단원 섹션 — no(01, 02…)를 주면 문서식 번호 라벨이 붙는다 */
+/** 페이지 내 대단원 섹션: no(01, 02…)를 주면 문서식 번호 라벨이 붙는다 */
 export function Section({
   id,
   no,
@@ -24,7 +24,7 @@ export function Section({
   )
 }
 
-/** 상세 페이지 상단 앵커 내비게이션 — 긴 페이지에서 원하는 섹션으로 바로 이동 */
+/** 상세 페이지 상단 앵커 내비게이션: 긴 페이지에서 원하는 섹션으로 바로 이동 */
 export function SectionNav({ items }: { items: { id: string; label: string }[] }) {
   return (
     <nav className="sticky top-14 z-40 -mx-4 border-b border-slate-100 bg-white/90 px-4 py-2.5 backdrop-blur sm:-mx-6 sm:px-6">
@@ -142,7 +142,7 @@ export function Expand({ summary, children }: { summary: string; children: React
   )
 }
 
-/** '가장 파고든 것' — 훑어보는 사람이 이것만 읽어도 되도록 크게 한 번 강조 */
+/** '가장 파고든 것': 훑어보는 사람이 이것만 읽어도 되도록 크게 한 번 강조 */
 export function Highlight({ lines, gains }: { lines: ReactNode[]; gains: ReactNode[] }) {
   return (
     <div className="rounded-md border-l-4 border-accent bg-accent-soft/70 px-6 py-6 sm:px-8">
@@ -171,7 +171,7 @@ export function Highlight({ lines, gains }: { lines: ReactNode[]; gains: ReactNo
   )
 }
 
-/** 팀 역할 분배 — 내 담당 행만 강조해 '내 지분'이 한눈에 보이게 */
+/** 팀 역할 분배: 내 담당 행만 강조해 '내 지분'이 한눈에 보이게 */
 export function RoleSplit({
   roles,
 }: {
@@ -212,7 +212,7 @@ export function RoleSplit({
   )
 }
 
-/** '왜 이 기술이었나' — 도입 이유와 감수한 것을 한 행으로 훑는 표 */
+/** '왜 이 기술이었나': 도입 이유와 감수한 것을 한 행으로 훑는 표 */
 export function WhyTech({
   items,
 }: {
@@ -225,7 +225,7 @@ export function WhyTech({
           <tr className="border-b border-slate-200 bg-slate-50 text-sm text-slate-500">
             <th className="w-44 px-4 py-3 font-semibold text-ink">기술</th>
             <th className="w-2/5 px-4 py-3 font-semibold">도입 이유</th>
-            <th className="px-4 py-3 font-semibold">감수한 것 · 알게 된 것</th>
+            <th className="px-4 py-3 font-semibold">감수한 것, 알게 된 것</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -244,7 +244,7 @@ export function WhyTech({
   )
 }
 
-/** 성과와 배운 점 — 페이지의 결론. 한 단 눌러 담은 마무리 박스와 큰 마침 문장 */
+/** 성과와 배운 점: 페이지의 결론. 한 단 눌러 담은 마무리 박스와 큰 마침 문장 */
 export function Retrospect({
   gains,
   questions,
@@ -289,13 +289,27 @@ export function Retrospect({
   )
 }
 
-/** 불릿 리스트 (본문용) — 점을 첫 줄 중앙에 맞추고, 줄바꿈 시 본문이 첫 글자에 정렬된다 */
+/** 불릿 리스트 (본문용): 점을 첫 줄 중앙에 맞추고, 줄바꿈 시 본문이 첫 글자에 정렬된다 */
 export function Bullets({ items }: { items: ReactNode[] }) {
   return (
     <ul className="space-y-2.5">
       {items.map((item, i) => (
         <li key={i} className="flex gap-2.5 leading-relaxed">
           <span className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-line" />
+          <span className="min-w-0">{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** 개조식 하위 항목 — 굵은 제목 아래 짧은 줄로 나눠 한눈에 읽히게 */
+export function Sub({ items, flush = false }: { items: ReactNode[]; flush?: boolean }) {
+  return (
+    <ul className={(flush ? '' : 'mt-1.5 ') + 'space-y-1 text-[15px] leading-relaxed text-slate-600'}>
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-2">
+          <span className="shrink-0 text-slate-400">-</span>
           <span className="min-w-0">{item}</span>
         </li>
       ))}

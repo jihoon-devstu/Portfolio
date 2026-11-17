@@ -35,7 +35,7 @@ function Step({
 
 /**
  * 트러블슈팅: 문제 → 원인 → 해결 → 결과 4단 구조.
- * 긴 부연 설명·이미지·코드는 detail(펼치기 영역)로 내려 가시성을 유지한다.
+ * 긴 부연 설명, 이미지, 코드는 detail(펼치기 영역)로 내려 가시성을 유지한다.
  */
 export default function TroubleCard({
   no,

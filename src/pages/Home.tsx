@@ -2,33 +2,33 @@ import { Link } from 'react-router-dom'
 import { CONTACT } from '../components/Layout'
 import { Bullets, Tag } from '../components/ui'
 
-/** 나는 어떤 사람인가 — 자기소개서의 강점 세 가지를 압축 */
+/** 나는 어떤 사람인가: 자기소개서의 강점 세 가지를 압축 */
 const VALUES = [
   {
     key: 'Why',
     title: '왜를 먼저 묻습니다',
-    body: '마케팅 기획을 할 때도 타겟이 왜 반응할지부터 따졌습니다. 개발에서는 그 답을 측정과 근거로 확인할 수 있어 전향했고, 기술도 대안과 감수할 것을 비교한 뒤 고릅니다.',
+    body: '마케팅 기획 때도 타겟이 왜 반응할지부터 따졌습니다. 개발에서는 그 답을 측정과 근거로 확인하고, 기술도 대안과 비교해 고릅니다.',
   },
   {
     key: 'Lead',
     title: '팀이 끝까지 완주하게',
-    body: '두 번의 팀 프로젝트에서 모두 팀장을 맡았습니다. 가이드 문서와 컨벤션으로 기준을 먼저 세우고, 팀원 모두가 맡은 기능을 끝까지 완성하도록 이끌었습니다.',
+    body: '두 번의 팀 프로젝트 모두 팀장을 맡았습니다. 문서와 컨벤션으로 기준을 먼저 세우고, 모두가 맡은 기능을 끝까지 완성하게 이끌었습니다.',
   },
   {
     key: 'Record',
     title: '기록을 다음 판단의 근거로',
-    body: '회사에서는 미팅 녹음을 회의록과 일정으로, 개발에서는 결정 로그와 트러블슈팅 90건으로 남겼습니다. 새 방식이 나오면 기록과 비교해 더 나은 쪽을 고릅니다.',
+    body: '회의록, 결정 로그, 트러블슈팅 90건으로 남기고, 새 방식이 나오면 기록과 비교해 더 나은 쪽을 고릅니다.',
   },
 ]
 
-/** 개발 회고에서 인용 — AI와 일할 때 스스로 던지는 질문 */
+/** 개발 회고에서 인용: AI와 일할 때 스스로 던지는 질문 */
 const AI_QUESTIONS = [
   'AI 없이도 이것을 구현할 수 있는가?',
   'AI 없이 나는 어디까지 할 수 있는가?',
   'AI가 주어진다면 어디까지 해낼 수 있는가?',
 ]
 
-/** 학력·경력 통합 타임라인 (시간순) */
+/** 학력, 경력 통합 타임라인 (시간순) */
 const TIMELINE: {
   period: string
   title: string
@@ -44,26 +44,26 @@ const TIMELINE: {
   },
   {
     period: '2020.08 – 2024.12',
-    title: '(주) 플라잉에그 — 4년 4개월',
-    desc: '네이버 스마트스토어 두 곳 운영 · SK가스 마케팅 대행',
+    title: '(주) 플라잉에그: 4년 4개월',
+    desc: '네이버 스마트스토어 두 곳 운영, SK가스 마케팅 대행',
     highlight: false,
   },
   {
     period: '2025.04 – 2025.10',
-    title: 'Java 기반 백엔드 개발자 양성 과정 — 최우수 팀 수료',
-    desc: 'intelliMarket · Fantry 팀 프로젝트 진행',
+    title: 'Java 기반 백엔드 개발자 양성 과정: 최우수 팀 수료',
+    desc: 'intelliMarket, Fantry 팀 프로젝트 진행',
     highlight: true,
   },
   {
     period: '2025.11 – 2026.04',
-    title: '개선 방향 학습 · 자격증 준비',
-    desc: '이전 프로젝트가 남긴 한계의 개선 방향 학습, SQLD 취득',
+    title: '개선 방향 학습 / 자격증 준비',
+    desc: '이전 프로젝트의 한계를 공부, SQLD 취득',
     highlight: false,
   },
   {
     period: '2026.05 – 2026.11',
     title: '청년취업사관학교 새싹(SeSAC) 영등포캠퍼스 8기',
-    desc: 'MSA 기반 웹 서비스 개발 과정 · 미니 프로젝트 따숨(Ddasoom), 최종 프로젝트 곳간(GOTGAN) 개발',
+    desc: 'MSA 웹 서비스 개발 과정, 미니 프로젝트 따숨, 최종 프로젝트 곳간',
     highlight: true,
     ongoing: true,
   },
@@ -75,51 +75,51 @@ const CERTIFICATES = [
   { name: 'JLPT N1', date: '2019.08', note: '일본어능력시험 최상위 급수' },
 ]
 
-/** 핵심 역량 — 프로젝트에서 실제로 부딪히며 배운 것 중심 */
+/** 핵심 역량: 프로젝트에서 실제로 부딪히며 배운 것 중심 */
 const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string }[] = [
   {
     title: '클라우드 인프라와 운영',
     desc: [
-      'Terraform으로 VPC · EKS · SNS/SQS · S3 · Lambda 구성, 매일 08:00 생성 · 22:00 삭제 자동화',
-      'GitHub Actions → ECR → Argo CD GitOps 배포 흐름 위에서 운영',
-      'IRSA · IMDSv2로 파드별 최소 권한, k6 측정값으로 힙 · DB 연결 · 레플리카 결정',
+      'Terraform으로 VPC, EKS, SNS/SQS, Lambda 구성',
+      '클러스터를 매일 자동으로 만들고 지움 (GitOps 배포)',
+      'IRSA로 파드별 최소 권한, k6 측정값으로 사이징',
     ],
-    tags: ['AWS EKS', 'Terraform', 'Kubernetes · Helm', 'Argo CD'],
+    tags: ['AWS EKS', 'Terraform', 'Kubernetes / Helm', 'Argo CD'],
     from: '곳간에서 경험',
   },
   {
     title: '분산 환경의 정합성',
     desc: [
-      '서비스 10개를 1홉 동기 호출(타임아웃 · 서킷) + 이벤트로 연결',
-      '아웃박스 · eventId 멱등 · 발생 시각 비교로 이벤트 유실 · 중복 · 순서 문제 처리',
-      '결제 취소는 선기록 → PG 호출 → 확정, 결과를 모르면 PG 조회로 대조',
+      '서비스 10개를 동기 호출 1홉 + 이벤트로 연결',
+      '아웃박스, 멱등, 발생 시각 비교로 이벤트 정합성',
+      '결제 취소는 선기록 후 호출, 모르면 조회로 대조',
     ],
-    tags: ['MSA', 'SNS · SQS', 'Resilience4j', 'Saga · 보상'],
+    tags: ['MSA', 'SNS / SQS', 'Resilience4j', 'Saga / 보상'],
     from: '곳간에서 경험',
   },
   {
     title: '동시성 제어와 성능',
     desc: [
-      '입찰 조회·검증·갱신을 Redis Lua Script 단일 원자 연산으로 처리',
-      'Redis 예외 시 DB 비관적 락으로 전환, 재동기화 성공 시 복귀',
-      'k6 부하테스트로 동시성 버그 4개를 찾아 재측정까지 확인, 채팅 데드락 · 스레드 풀 설정은 직접 수정 (왕복 p95 1.95s → 87ms)',
+      'Redis Lua Script로 입찰 조회, 검증, 갱신을 한 번에',
+      'Redis 예외 시 DB 락으로 전환 후 복귀',
+      'k6로 동시성 버그 4개 발견, 채팅 왕복 1.95s → 87ms',
     ],
-    tags: ['Redis · Lua Script', '비관적 락', 'WebSocket · STOMP', 'k6'],
-    from: 'Fantry · 곳간에서 경험',
+    tags: ['Redis / Lua Script', '비관적 락', 'WebSocket / STOMP', 'k6'],
+    from: 'Fantry, 곳간에서 경험',
   },
   {
     title: '인증과 보안 설계',
     desc: [
-      'AT는 프론트 메모리, RT는 HttpOnly 쿠키 + Redis, 재발급마다 RT 교체',
-      'jti 블랙리스트 + 회원 단위 강제 로그아웃 마커로 즉시 차단',
-      'WebSocket 전송 목적지 검사 · 업로드 파일 실제 형식 검사(Lambda)',
+      'AT는 메모리, RT는 HttpOnly 쿠키 + Redis',
+      'jti 블랙리스트와 회원 단위 마커로 즉시 차단',
+      'WebSocket 목적지 검사, 업로드 파일 형식 검사',
     ],
-    tags: ['Spring Security', 'JWT · OAuth2', 'Keycloak', 'Redis TTL 설계'],
-    from: 'Ddasoom · 곳간에서 경험',
+    tags: ['Spring Security', 'JWT / OAuth2', 'Keycloak', 'Redis TTL 설계'],
+    from: 'Ddasoom, 곳간에서 경험',
   },
 ]
 
-/** 기술 스택 — 한 줄로 훑는 배지 목록 */
+/** 기술 스택: 한 줄로 훑는 배지 목록 */
 const STACKS: { group: string; items: string[] }[] = [
   {
     group: 'Backend',
@@ -127,27 +127,27 @@ const STACKS: { group: string; items: string[] }[] = [
   },
   {
     group: 'MSA',
-    items: ['Spring Cloud Gateway', 'Resilience4j', 'Keycloak', 'SNS · SQS (아웃박스)', 'WebSocket · STOMP', 'SSE'],
+    items: ['Spring Cloud Gateway', 'Resilience4j', 'Keycloak', 'SNS, SQS (아웃박스)', 'WebSocket / STOMP', 'SSE'],
   },
   {
     group: 'Database',
     items: ['MySQL', 'Oracle', 'Redis', 'DynamoDB', 'Flyway'],
   },
   {
-    group: 'Cloud · DevOps',
-    items: ['AWS (EKS · Lambda · S3 · Route 53)', 'Terraform', 'Docker', 'Kubernetes', 'Helm', 'GitHub Actions', 'Argo CD'],
+    group: 'Cloud / DevOps',
+    items: ['AWS (EKS / Lambda / S3 / Route 53)', 'Terraform', 'Docker', 'Kubernetes', 'Helm', 'GitHub Actions', 'Argo CD'],
   },
   {
-    group: 'Observability · Test',
+    group: 'Observability / Test',
     items: ['Prometheus', 'Loki', 'Grafana', 'Zipkin', 'k6', 'SonarQube Cloud'],
   },
   {
     group: 'Frontend',
-    items: ['HTML5 · CSS3','JavaScript (ES6+)', 'TypeScript', 'React', 'Vue 3', 'JSP · JSTL'],
+    items: ['HTML5 / CSS3','JavaScript (ES6+)', 'TypeScript', 'React', 'Vue 3', 'JSP / JSTL'],
   },
   {
-    group: 'Tools · 협업',
-    items: ['Git · GitHub', 'Claude Code', 'Swagger', 'Notion', 'Slack', 'IntelliJ', 'VS Code', 'Eclipse'],
+    group: 'Tools / 협업',
+    items: ['Git / GitHub', 'Claude Code', 'Swagger', 'Notion', 'Slack', 'IntelliJ', 'VS Code', 'Eclipse'],
   },
 ]
 
@@ -156,29 +156,29 @@ const PROJECTS = [
     to: '/gotgan',
     period: '2026.10 – 2026.11',
     name: '곳간 (GOTGAN)',
-    summary: 'MSA 멀티 스토어 오픈마켓 — AWS 인프라 · 결제 · 정산 · 관리자 · 채팅',
+    summary: 'MSA 멀티 스토어 오픈마켓: AWS 인프라, 결제, 정산, 관리자, 채팅',
     highlight:
-      '서비스 10개를 Terraform으로 만든 EKS에 배포, 결제 · 이벤트 정합성 설계, k6 측정 → 수정 → 재측정 (채팅 왕복 p95 1.95s → 87ms), 관리자 화면에서 부하테스트와 실시간 모니터링',
-    tags: ['AWS EKS · Terraform', 'MSA', 'SNS · SQS 아웃박스', 'k6 부하테스트'],
+      'EKS 위 서비스 10개, 결제와 이벤트 정합성, k6 측정 → 수정 → 재측정, 관리자 화면 모니터링',
+    tags: ['AWS EKS / Terraform', 'MSA', 'SNS, SQS 아웃박스', 'k6 부하테스트'],
     badge: '대표 프로젝트',
   },
   {
     to: '/fantry',
     period: '2025.09 – 2025.10',
     name: 'Fantry',
-    summary: '실시간 중고 경매 플랫폼 — 실시간 경매 시스템 담당',
+    summary: '실시간 중고 경매 플랫폼: 실시간 경매 시스템 담당',
     highlight:
-      'DB 직접 처리 → Redis Lua Script 동시성 제어 → DB Fallback → 큐 기반 일괄 저장 단계적 고도화',
-    tags: ['WebSocket·STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
+      'DB 직접 처리 → Redis Lua Script → DB Fallback → 큐 저장 순으로 고도화',
+    tags: ['WebSocket / STOMP', 'Redis Lua Script', '동시성 제어', 'DB Fallback'],
     badge: null,
   },
   {
     to: '/ddasoom',
     period: '2026.06 – 2026.07',
     name: 'Ddasoom (따숨)',
-    summary: '유기동물 임시보호 플랫폼 — 팀장 · 회원/보안/공통모듈',
+    summary: '유기동물 임시보호 플랫폼: 팀장, 회원과 보안, 공통 모듈',
     highlight:
-      'Spring Security 인증/인가 인프라 설계 — 토큰 저장 위치, 강제 로그아웃 마커 결정 로그 2건',
+      'Spring Security 인증 설계: 토큰 저장 위치와 즉시 차단 결정 로그',
     tags: ['Spring Security', 'JWT', 'OAuth2', 'Redis'],
     badge: '팀장',
   },
@@ -186,9 +186,9 @@ const PROJECTS = [
     to: '/intellimarket',
     period: '2025.07 – 2025.08',
     name: 'intelliMarket',
-    summary: 'JSP 기반 SSR 쇼핑몰 — 스토어 상품/주문 관리',
+    summary: 'JSP 기반 SSR 쇼핑몰: 스토어 상품/주문 관리',
     highlight:
-      'Spring Legacy · JSP 환경에서 3단계 카테고리 설계, MyBatis N+1 개선 (연쇄 조회 → JOIN)',
+      'Spring Legacy와 JSP로 3단계 카테고리 설계, MyBatis N+1 개선',
     tags: ['Spring Legacy', 'MyBatis', 'N+1 개선', 'JSP SSR'],
     badge: null,
   },
@@ -196,10 +196,10 @@ const PROJECTS = [
     to: '/aimpro',
     period: '2025.05',
     name: 'Aim Pro',
-    summary: '반응속도 타겟 클릭 게임 — 개발 1개월차 첫 개인 프로젝트',
+    summary: '반응속도 타겟 클릭 게임: 개발 1개월차 첫 개인 프로젝트',
     highlight:
-      '라이브러리 없이 HTML·CSS·JS만으로 완성 — 클래스 기반 타겟 설계, 게임 상태 관리',
-    tags: ['HTML · CSS · JS', '클래스 설계', '상태 관리'],
+      '라이브러리 없이 HTML, CSS, JS만으로 완성, 클래스 기반 타겟',
+    tags: ['HTML / CSS / JS', '클래스 설계', '상태 관리'],
     badge: '첫 개인 프로젝트',
   },
 ]
@@ -261,7 +261,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 개발 회고 인용 — AI와 일하는 기준 */}
+        {/* 개발 회고 인용: AI와 일하는 기준 */}
         <figure className="mt-12 rounded-md bg-slate-50 px-6 py-7 sm:px-8">
           <figcaption className="text-sm font-bold text-accent">개발 회고 중에서</figcaption>
           <ol className="mt-4 space-y-2">
@@ -273,13 +273,12 @@ export default function Home() {
             ))}
           </ol>
           <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
-            AI가 많은 일을 대신할수록 무엇을 만들지 설계하고, 결과가 맞는지 검증하고, 책임지는 사람이 더
-            필요하다고 생각합니다. 그래서 일할 때 이 세 가지를 스스로 묻고, AI에게는 하지 말아야 할 것과
-            참고할 문서, 지킬 기준을 먼저 정해 준 뒤 맡깁니다.
+            AI가 많은 일을 대신할수록 설계하고, 검증하고, 책임지는 사람이 더 필요하다고 봅니다. 그래서 AI에게는
+            하지 말아야 할 것과 참고할 문서, 지킬 기준을 먼저 정해 준 뒤 맡깁니다.
           </p>
         </figure>
 
-        {/* 학력·경력 타임라인 */}
+        {/* 학력, 경력 타임라인 */}
         <div className="mt-12">
           <h3 className="mb-5 text-sm font-bold uppercase tracking-widest text-slate-400">History</h3>
           <ol className="relative ml-2 space-y-7 border-l-2 border-slate-200 pl-6">
