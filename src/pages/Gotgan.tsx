@@ -84,7 +84,7 @@ function LoadTestTable() {
   const rows: { item: string; before: string; fix: string; after: string }[] = [
     { item: '재고 10개에 100명 동시 주문', before: '성공 10, 초과 판매 0', fix: '그대로', after: '성공 10, 초과 판매 0' },
     { item: '동시 주문 500 오류', before: '71 / 100', fix: '주문번호 원자 발급', after: '0 / 100' },
-    { item: '채팅 왕복 p95 (500 연결)', before: '1.95s', fix: '스레드 풀 분리, 힙 상한', after: '87ms' },
+    { item: '채팅 왕복 p95 (500 연결)', before: '1.95s', fix: '알림과 채팅 스레드 분리', after: '87ms' },
     { item: 'DB 연결 최대', before: '151(상한), 거부 1', fix: '연결 수 계산, 상한 300', after: '171 / 300, 거부 0' },
     { item: '30분 혼합 (동시 200명)', before: 'p95 94ms, 500 76건', fix: '위 수정 + 이중화', after: 'p95 88ms, 500 0건' },
     { item: '파드 삭제 중 구매', before: '미측정', fix: '레플리카 2, 노드 분산, PDB', after: '5xx 0건 (10만 요청)' },
@@ -95,9 +95,9 @@ function LoadTestTable() {
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 text-sm text-slate-500">
             <th className="px-4 py-3 font-semibold text-ink">항목</th>
-            <th className="px-4 py-3 font-semibold">1차 (11/4)</th>
+            <th className="px-4 py-3 font-semibold">1차 (11/4~5)</th>
             <th className="px-4 py-3 font-semibold">고친 것</th>
-            <th className="px-4 py-3 font-semibold text-accent-deep">2차 (11/6)</th>
+            <th className="px-4 py-3 font-semibold text-accent-deep">2차 (11/6~7)</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -134,7 +134,7 @@ export default function Gotgan() {
           { label: '기간', value: '2026.10 – 2026.11 (6주)' },
           { label: '팀 구성', value: '3명 (팀장, 서비스 수직 분할)' },
           { label: '담당', value: 'AWS 인프라, 결제, 정산, 관리자, 채팅' },
-          { label: '과정', value: 'SeSAC 영등포캠퍼스 8기 최종' },
+          { label: '과정', value: 'SeSAC 영등포캠퍼스 8기 최종 (최우수팀, 우수 프로젝트상)' },
         ]}
         stacks={[
           'Java 21',
@@ -185,7 +185,7 @@ export default function Gotgan() {
         <div className="max-w-3xl border-l-2 border-accent-line pl-5 sm:pl-6">
           <ul className="space-y-2.5 text-base leading-relaxed text-slate-700">
             <li>
-              <b>무엇을</b>: 입점부터 주간 정산까지 한 흐름 (필수 기능 85건 중 82건, 화면 54개)
+              <b>무엇을</b>: 입점부터 주간 정산까지 한 흐름 (필수 기능 85건 중 82건, 화면 55개)
             </li>
             <li>
               <b>목표 1</b>: 서비스 하나가 멈춰도 나머지 기능은 계속 동작 (장애 격리)
@@ -197,8 +197,8 @@ export default function Gotgan() {
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard value="10개" label="Spring Boot 서비스 + Lambda 5개" />
-          <StatCard value="489개" label="머지된 PR (내 PR 241개)" />
-          <StatCard value="2,174개" label="테스트 케이스" />
+          <StatCard value="525개" label="머지된 PR (내 PR 275개)" />
+          <StatCard value="2,278개" label="테스트 케이스" />
           <StatCard value="90건" label="트러블슈팅 기록" />
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -228,7 +228,7 @@ export default function Gotgan() {
             {
               role: '인프라, 결제, 정산, 관리자, 채팅',
               detail:
-                'Terraform 인프라, payment, settlement, admin, chat, Lambda 3개, QA와 부하테스트, 모니터링 화면',
+                '가이드 문서, Terraform 인프라, payment, settlement, admin, chat, Lambda 4개, QA와 부하테스트, 모니터링 화면',
               mine: true,
             },
             {
@@ -256,7 +256,7 @@ export default function Gotgan() {
               <Sub
                 items={[
                   '가이드라인(왜): 설계 배경과 결정 이유, 22개 장',
-                  '스펙(무엇을): 도메인별 요구사항 145건',
+                  '스펙(무엇을): 도메인별 요구사항 159건',
                   '컨벤션(어떻게): 코드, DB, 프론트, 인프라 규칙',
                 ]}
               />
@@ -271,7 +271,7 @@ export default function Gotgan() {
               />
             </>,
             <>
-              <b>목업 56개 화면</b>
+              <b>목업 55개 화면</b>
               <Sub
                 items={[
                   '프론트에 이식한 뒤 API로 하나씩 교체',
@@ -330,7 +330,7 @@ export default function Gotgan() {
         id="architecture"
         no="04"
         title="전체 구성"
-        subtitle="요청 한 건이 지나가는 길입니다. 인프라 전체는 Terraform 코드로 매일 08:00에 만들고 22:00에 지웁니다."
+        subtitle="요청 한 건이 지나가는 길입니다. 인프라 전체는 Terraform 코드로 만들고, 개발 기간에는 클러스터를 매일 08:00에 만들어 22:00에 지웠습니다."
       >
         <ArchDiagram />
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -359,7 +359,7 @@ export default function Gotgan() {
           items={[
             {
               tech: 'Terraform, 매일 재생성',
-              why: <>코드로 만든 인프라를 매일 08:00 생성, 22:00 삭제 (운영비 월 72만 → 45만 원)</>,
+              why: <>개발 기간에는 클러스터를 매일 08:00 생성, 22:00 삭제 (24시간 월 72만 원 → 약 45만 원), 11/17부터 24시간 운영</>,
               learned: <>서버에서 고친 것은 다음 날 사라짐 → 모든 수정을 코드와 문서로 남김</>,
             },
             {
@@ -404,12 +404,12 @@ export default function Gotgan() {
           <Bullets
             items={[
               <>
-                <b>동시에 와야만 깨지는 버그 4개</b>를 찾아 담당별로 수정, 전부 재측정으로 확인
-                <Sub items={['주문번호 충돌, 가입 고아 계정, DB 연결 상한, 채팅 데드락']} />
+                <b>동시에 몰려야만 드러나는 문제 7건</b>을 찾아 담당별로 수정, 전부 재측정으로 확인
+                <Sub items={['가입 고아 계정, 주문번호 충돌, DB 연결 고갈, 채팅 데드락', '채팅 지연, 힙 상한 초과 재시작, 정산 집계 502']} />
               </>,
               <>
                 <b>측정값으로 설정 결정</b>
-                <Sub items={['힙 상한 75% → 33%, DB 연결 상한 300', '구매 경로 서비스 6개는 레플리카 2, 노드 분산, PDB']} />
+                <Sub items={['힙 상한 75% → 33%, DB 연결 상한 151 → 300', '구매 경로 서비스는 파드 2개, 노드 분산, PDB', '이후 HPA로 파드 2~4개, Cluster Autoscaler로 노드 2~3대']} />
               </>,
               <>
                 <b>한계와 장애 격리</b>
@@ -609,8 +609,8 @@ export default function Gotgan() {
               <Sub items={['PR마다 팀원 승인 1명 + 새 코드 커버리지 80%, 중복 3%', '백엔드는 테스트 코드가 운영 코드보다 많음']} />
             </>,
             <>
-              <b>실계정 전체 QA</b>
-              <Sub items={['실계정 6개, 테스트 결제, 실제 메일로 49개 항목 확인', '지적 32건 중 31건 수정']} />
+              <b>실계정 전체 QA (1차, 2차)</b>
+              <Sub items={['실계정, 테스트 결제, 실제 메일로 49개 항목과 전체 화면 점검', '발견한 74건 모두 처리 (72건 수정, 2건은 팀 결정으로 유지)', 'API 연동 133건 전수 대조, 불일치 4건 수정']} />
             </>,
             <>
               <b>기록</b>

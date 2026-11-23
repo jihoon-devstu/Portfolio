@@ -62,10 +62,9 @@ const TIMELINE: {
   },
   {
     period: '2026.05 – 2026.11',
-    title: '청년취업사관학교 새싹(SeSAC) 영등포캠퍼스 8기',
-    desc: 'MSA 웹 서비스 개발 과정, 미니 프로젝트 따숨, 최종 프로젝트 곳간',
+    title: '청년취업사관학교 새싹(SeSAC) 영등포캠퍼스 8기: 최우수팀 수료',
+    desc: 'MSA 웹 서비스 개발 과정, 최종 프로젝트 곳간으로 우수 프로젝트상 수상, 미니 프로젝트 따숨',
     highlight: true,
-    ongoing: true,
   },
 ]
 
@@ -102,7 +101,7 @@ const CORE_SKILLS: { title: string; desc: string[]; tags: string[]; from: string
     desc: [
       'Redis Lua Script로 입찰 조회, 검증, 갱신을 한 번에',
       'Redis 예외 시 DB 락으로 전환 후 복귀',
-      'k6로 동시성 버그 4개 발견, 채팅 왕복 1.95s → 87ms',
+      'k6로 동시성 문제 7건 발견, 채팅 왕복 1.95s → 87ms',
     ],
     tags: ['Redis / Lua Script', '비관적 락', 'WebSocket / STOMP', 'k6'],
     from: 'Fantry, 곳간에서 경험',
