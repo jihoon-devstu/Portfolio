@@ -205,7 +205,7 @@ export default function Gotgan() {
           <Figure
             src="/images/gotgan/service-main.png"
             alt="곳간 쇼핑몰 메인 화면"
-            caption="배포된 쇼핑몰 메인"
+            caption="쇼핑몰 메인"
             imgClassName="h-64 object-cover object-top"
           />
           <Figure
