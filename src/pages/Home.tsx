@@ -1,6 +1,35 @@
 import { Link } from 'react-router-dom'
 import { CONTACT } from '../components/Layout'
-import { Bullets, Tag } from '../components/ui'
+import { Bullets, Figure, Tag } from '../components/ui'
+
+/** 직접 만들어 운영하는 학습 아카이브 */
+const ARCHIVE_URL = 'https://devstu-archive.vercel.app'
+
+const ARCHIVE_STATS = [
+  { value: '165', label: '공개 문서' },
+  { value: '20', label: '주제 섹션' },
+  { value: '850+', label: '도식 · 흐름도' },
+]
+
+/** 공부하는 순서: 모으고, 다시 쓰고, 설명하고, 검증한다 */
+const STUDY_STEPS: { title: string; desc: string[] }[] = [
+  {
+    title: '모은다',
+    desc: ['수업 자료, 노션 정리, 프로젝트 기록을 한곳에', '곳간 트러블슈팅 90건을 주제별 사례로 재구성'],
+  },
+  {
+    title: '다시 쓴다',
+    desc: ['외운 문장이 아니라 구조로: 흐름도, 계층도, 비교표', '장마다 "꼭 짚고 넘어갈 것"과 다음 도전으로 마무리'],
+  },
+  {
+    title: '설명한다',
+    desc: ['개발을 모르는 사람용 바이브코딩 가이드 25장', '면접 질문을 "정의 → 이유 → 경험 → 한계"로 정리'],
+  },
+  {
+    title: '검증한다',
+    desc: ['AI와 함께 만들되 테스트 237개로 확인', '전 문서 렌더링과 도식 정렬을 PC, 모바일에서 전수 검사'],
+  },
+]
 
 /** 나는 어떤 사람인가: 자기소개서의 강점 세 가지를 압축 */
 const VALUES = [
@@ -237,6 +266,16 @@ export default function Home() {
             >
               {CONTACT.email}
             </a>
+            <a
+              href="#study"
+              className="inline-flex items-center gap-2 rounded-full border border-accent-line bg-accent-soft px-3.5 py-1.5 text-sm font-semibold text-accent-deep transition-colors hover:border-accent"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+              </span>
+              학습 아카이브 운영 중
+            </a>
           </div>
         </div>
         <img
@@ -323,9 +362,76 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Study: 직접 운영하는 학습 아카이브 */}
+      <section id="study" className="scroll-mt-20 border-t border-slate-200 py-14">
+        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">02</p>
+        <h2 className="mt-1 text-2xl font-bold text-ink">How I Study</h2>
+        <p className="mt-2 text-slate-500">배운 것은 다른 사람에게 설명할 수 있을 때까지 정리합니다.</p>
+
+        <div className="mt-8 grid gap-10 md:grid-cols-[1.15fr_1fr] md:gap-12">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-white">운영 중</span>
+              <h3 className="text-xl font-bold text-ink">DevStu Archive</h3>
+            </div>
+            <p className="mt-2 leading-relaxed text-slate-600">
+              수업 자료, 노션 정리, 프로젝트 트러블슈팅을 주제별로 다시 묶어 직접 만들고 운영하는 학습 사이트입니다.
+              AI 에이전트, 백엔드, 인프라, 프론트, 앱, CS까지 다룹니다.
+            </p>
+
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              {ARCHIVE_STATS.map((s) => (
+                <div key={s.label} className="rounded-md border border-slate-200 px-3 py-3 text-center">
+                  <div className="text-2xl font-extrabold text-accent-deep">{s.value}</div>
+                  <div className="mt-0.5 text-xs font-semibold text-slate-500">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <ol className="mt-8 space-y-5">
+              {STUDY_STEPS.map((step, i) => (
+                <li key={step.title} className="flex gap-4">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-extrabold text-accent-deep">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="font-bold text-ink">{step.title}</div>
+                    <div className="mt-1 text-base text-slate-600">
+                      <Bullets items={step.desc} />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-7 flex flex-wrap gap-1.5">
+              {['React + Vite + TypeScript', 'Firebase 관리자 인증', 'Vercel', 'Claude Code'].map((t) => (
+                <Tag key={t}>{t}</Tag>
+              ))}
+            </div>
+
+            <a
+              href={ARCHIVE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-7 inline-block font-semibold text-ink underline decoration-accent decoration-2 underline-offset-8 transition-colors hover:text-accent"
+            >
+              DevStu Archive 방문하기 ↗
+            </a>
+          </div>
+
+          <Figure
+            src="/images/devstu/archive-vibe-guide.png"
+            alt="DevStu Archive 바이브코딩 가이드 2장 화면"
+            caption="바이브코딩 가이드 2장: 개발을 모르는 사람도 따라오도록 장면, 비유, 흐름도로 설명"
+            className="md:sticky md:top-20 md:self-start"
+          />
+        </div>
+      </section>
+
       {/* Skills */}
       <section className="border-t border-slate-200 py-14">
-        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">02</p>
+        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">03</p>
         <h2 className="mt-1 text-2xl font-bold text-ink">Skills</h2>
         <p className="mt-2 text-slate-500">프로젝트에서 실제로 부딪히며 배운 것 중심입니다.</p>
 
@@ -372,7 +478,7 @@ export default function Home() {
 
       {/* Projects */}
       <section className="border-t border-slate-200 py-14">
-        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">03</p>
+        <p className="text-lg font-extrabold tracking-[0.2em] text-accent">04</p>
         <h2 className="mt-1 text-2xl font-bold text-ink">Projects</h2>
         <p className="mt-2 text-slate-500">
           왜 시작했고, 무엇이 어려웠고, 어떻게 해결했는지를 과정 중심으로 정리했습니다.
